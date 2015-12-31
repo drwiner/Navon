@@ -29,7 +29,7 @@ class Canvas:
         everyPixel = [(r,c) for r in canvasRange for c in canvasRange];
         # Every 1x1 coordinate in the canvasRange
         
-        self.cellList  = [Cell(PVector(r,c),self.fs) for r,c in everyPixel if r%self.fs ==0 and c%(self.fs*2)==0];
+        self.cellList  = [Cell(PVector(r,c),self.fs) for r,c in everyPixel if r%self.fs ==0 and c%(self.fs)==0];
         #Not causing error
         
         return self.cellList;
