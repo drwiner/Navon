@@ -13,7 +13,7 @@ class Canvas:
           
         self.genCells(); 
     def execute(self):
-        a = 1;
+        return self.cellList;
         #Step 1 - return a list of coordinates and a size to draw
         #Step 2 - narrow down list of coordinates to just those that are some random subset for now, later representing the letter pattern
 
@@ -31,6 +31,7 @@ class Canvas:
         
         self.cellList  = [Cell(PVector(r,c),self.fs) for r,c in everyPixel if r%self.fs ==0 and c%(self.fs*2)==0];
         #Not causing error
+        
         return self.cellList;
     
     def lerpCanvas(vector):

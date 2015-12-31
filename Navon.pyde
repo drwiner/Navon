@@ -24,6 +24,7 @@ class controlCenter:
 
     def execute(self):
         canvasToDraw = self.canvas.execute();
+        # A "canvasToDraw" is a list of cells (self.cellList)
         sleep(.1);
         return canvasToDraw;
 
