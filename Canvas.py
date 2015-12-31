@@ -1,4 +1,5 @@
 from CanvasManager import CanvasManager;
+from CanvasManager import unpack;
 from Cell import Cell
 
 class Canvas:
@@ -17,10 +18,6 @@ class Canvas:
         #Step 1 - return a list of coordinates and a size to draw
         #Step 2 - narrow down list of coordinates to just those that are some random subset for now, later representing the letter pattern
 
-        #For all cells in this canvas, move and grow
-        #Delete any cells that are off the canvas range
-       # self.fs += self.growthRate;
-        #self.TFig.update(self.fs);
     def genCells(self):
         x,y = unpack(self.upperLeftCorner);
         canvasRange = range(int(x), int(x) + self.canvasSize);

@@ -1,6 +1,7 @@
 from Canvas import Canvas
 from time import sleep;
 from CanvasManager import CanvasManager;
+from CanvasManager import unpack;
 
 canvasSize = 600;
 twiceCanvas = canvasSize*2;
@@ -20,17 +21,14 @@ def draw():
     
 class controlCenter:
     def __init__(self):
-        canvas = Canvas(25,0,canvasSize,PVector(0,0));
-        self.activeCanvi = [canvas];
+        self.canvasManager = CanvasManager(Canvas(25,0,canvasSize,PVector(0,0)));
         # figure size, growth rate, upperLeftCoord, canvasSize
 
     def execute(self):
-        for canvas in self.activeCanvi:
-            canvasToDraw = canvas.execute();
-            if 
-            self.activeCanvi.append(canvas.
+        activeCanvi = self.canvasManager.update();
+        for canvas in activeCanvi:
             drawCanvas(canvas.execute());
-        # A "canvasToDraw" is a list of cells (self.cellList)
+            #canvas.execute() returns a list of cells
         sleep(.1);
         return True;
 

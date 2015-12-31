@@ -1,4 +1,5 @@
-from Canvas import Canvas
+
+
 class CanvasManager:
     def __init__(self, initialCanvas):
         self.canvasList = [initialCanvas];
@@ -16,6 +17,10 @@ class CanvasManager:
                             cell.isCanvas = True;
                             #initial size, growth rate, canvas size, upperleftcorner
                             self.canvasList.append(Canvas(25, canvas.growth, cell.dim, cell.position));
+                        #Remove unused cell
+                        elif not cell.iscanvas and not cellInCanvasBounds(cell,canvas):
+                            canvas.cellList.remove(cell);
+        return self.canvasList;
         
 def unpack(pvector):
     return (pvector.x,pvector.y);
