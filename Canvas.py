@@ -6,10 +6,8 @@ class Canvas:
         self.fs = initialCellSize;
         self.initial = initialCellSize;
         self.canvasSize = canvasSize; # To indicate current size of canvas
-        if (upperLeftCorner == 0):
-            self.upperLeftCorner = PVector(0,0); # To indicate current position of canvas
-        else:
-            self.upperLeftCorner = upperLeftCorner;
+        self.upperLeftCorner = upperLeftCorner;
+        # To indicate current position of canvas      
         #genCells(self, upperLeftCorner);
     def execute(self):
         #Step 1 - return a list of coordinates and a size to draw
