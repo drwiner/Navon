@@ -4,8 +4,10 @@ class CanvasManager:
     def __init__(self, initialCanvas):
         self.canvasList = [initialCanvas];
     
-    def update(self):
+    def update(self, amountIncrease):
         for canvas in self.canvasList:
+            canvas.fs += amountIncrease;
+            canvas.updateCells(amountIncrease);
             if not canvasInBounds(canvas):
                 self.canvasList.remove(canvas);
             else:

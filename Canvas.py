@@ -11,13 +11,20 @@ class Canvas:
         self.canvasSize = canvasSize; # To indicate current size of canvas
         self.upperLeftCorner = upperLeftCorner;
         # To indicate current position of canvas 
-          
         self.genCells(); 
+        
     def execute(self):
+        #Update Cells
         return self.cellList;
         #Step 1 - return a list of coordinates and a size to draw
         #Step 2 - narrow down list of coordinates to just those that are some random subset for now, later representing the letter pattern
 
+    def updateCells(self,increase):
+        for cell in self.cellList:
+            cell.dim += increase;
+            cell.position.x+=increase;
+            cell.position.y+=increase;
+    
     def genCells(self):
         x,y = unpack(self.upperLeftCorner);
         canvasRange = range(int(x), int(x) + self.canvasSize);

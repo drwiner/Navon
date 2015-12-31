@@ -25,9 +25,9 @@ class controlCenter:
         self.canvasManager = CanvasManager(Canvas(25,0,canvasSize,PVector(0,0)));
         # figure size, growth rate, upperLeftCoord, canvasSize
 
-    def execute(self):
+    def execute(self, increase = 0):
         #Update the canvas manager and pass back a list of active canvi
-        activeCanvi = self.canvasManager.update();
+        activeCanvi = self.canvasManager.update(increase);
         for canvas in activeCanvi:
             drawCanvas(canvas.execute(),canvas.fs);
             #canvas.execute() returns a list of cells
@@ -48,5 +48,5 @@ def testDraw(listOfCells, cellSize):
     fill(0,255,0,191);
     for cell in listOfCells:
         cellX,cellY = unpack(cell.position);
-        if cellX % cellSize*2 == 0 and cellY%cellSize*2 == 0:
+        if cellX % (cellSize*2) == 0 and cellY%(cellSize*2) == 0:
             rect(cellX,cellY,cell.dim,cell.dim);
