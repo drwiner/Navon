@@ -1,4 +1,6 @@
 
+from Cell import Cell
+
 class Canvas:
     
     def __init__(self, initialCellSize = 5, growth = 0, canvasSize = 600,  upperLeftCorner = 0):
@@ -7,7 +9,8 @@ class Canvas:
         self.initial = initialCellSize;
         self.canvasSize = canvasSize; # To indicate current size of canvas
         self.upperLeftCorner = upperLeftCorner;
-        # To indicate current position of canvas      
+        # To indicate current position of canvas   
+           
         #genCells(self, upperLeftCorner);
     def execute(self):
         #Step 1 - return a list of coordinates and a size to draw
@@ -20,8 +23,11 @@ class Canvas:
        # self.fs += self.growthRate;
         #self.TFig.update(self.fs);
     def genCells(self):
-        x,y = self.upperLeftCorner;
-        canvasRange = range(int(self.upperLeftCorner.x), int(self.upperLeftCorner.x + self.canvasSize));
+        x,y = (self.upperLeftCorner.x,self.upperLeftCorner.y);
+        canvasRange = range(int(self.upperLeftCorner.x), int(self.upperLeftCorner.x) + self.canvasSize);
+        # Checked and working: generating range from 0 to 599 (size is 600).
+        
+        # range from upperleftCorner x to upperleftCorner x + canvassize (from 0 to 600)
         everyPixel = [(r,c) for r in canvasRange for c in canvasRange];
         # for r,c in everyPixel:
         #     if r%self.fs ==0 and c%self.fs ==0:
