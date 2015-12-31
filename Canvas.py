@@ -1,4 +1,4 @@
-
+from CanvasManager import CanvasManager;
 from Cell import Cell
 
 class Canvas:
@@ -22,8 +22,8 @@ class Canvas:
        # self.fs += self.growthRate;
         #self.TFig.update(self.fs);
     def genCells(self):
-        x,y = (self.upperLeftCorner.x,self.upperLeftCorner.y);
-        canvasRange = range(int(self.upperLeftCorner.x), int(self.upperLeftCorner.x) + self.canvasSize);
+        x,y = unpack(self.upperLeftCorner);
+        canvasRange = range(int(x), int(x) + self.canvasSize);
         # Checked and working: generating range from 0 to 599 (size is 600).
 
         everyPixel = [(r,c) for r in canvasRange for c in canvasRange];

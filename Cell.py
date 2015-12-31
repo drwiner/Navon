@@ -12,18 +12,3 @@ class Cell:
             lerp(self.dim, self.desiredDim,.1);
         else:
             raise AttributeError("Desired Dimension not set");
-    
-    def outOfBounds(self):
-        x,y = self.position;
-        if x >= 0 and y >= 0 and x <= width-self.dim and y <= width-self.dim:
-            return True;
-        return False;
-    
-    def getCellAsRect(self):
-        if not self.outOfBounds():
-            return (self.position.x, self.position.y, self.dim);
-        
-def outOfBounds(x,y,cellSize):
-    if x >= 0 and y >= 0 and x <= width-cellSize and y <= width-cellSize:
-        return True;
-    return False;

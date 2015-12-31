@@ -1,5 +1,6 @@
 from Canvas import Canvas
 from time import sleep;
+from CanvasManager import CanvasManager;
 
 canvasSize = 600;
 twiceCanvas = canvasSize*2;
@@ -39,13 +40,13 @@ def drawCanvas(listOfCells):
 def realDraw(listOfCells):
     fill(0,255,0,191);
     for cell in listOfCells:
-        cellX,cellY = (cell.position.x,cell.position.y);
+        cellX,cellY = unpack(cell.position);
         print(cellX,cellY,cell.dim);
         rect(cellX,cellY,cell.dim,cell.dim);
                 
 def testDraw(listOfCells):
     fill(0,255,0,191);
     for cell in listOfCells:
-        cellX,cellY = (cell.position.x,cell.position.y);
+        cellX,cellY = unpack(cell.position);
         if cellX % 50 == 0 and cellY%50 == 0:
             rect(cellX,cellY,cell.dim,cell.dim);
