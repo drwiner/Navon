@@ -1,12 +1,15 @@
 
 class Canvas:
     
-    def __init__(self, initialCellSize = 5, growth = 5, canvasSize = 600,  upperLeftCorner = PVector(0,0)):
+    def __init__(self, initialCellSize = 5, growth = 0, canvasSize = 600,  upperLeftCorner = 0):
         self.growthRate = growth;
         self.fs = initialCellSize;
         self.initial = initialCellSize;
         self.canvasSize = canvasSize; # To indicate current size of canvas
-        self.upperLeftCorner = upperLeftCorner; # To indicate current position of canvas
+        if (upperLeftCorner == 0):
+            self.upperLeftCorner = PVector(0,0); # To indicate current position of canvas
+        else:
+            self.upperLeftCorner = upperLeftCorner;
         #genCells(self, upperLeftCorner);
     def execute(self):
         #Step 1 - return a list of coordinates and a size to draw
