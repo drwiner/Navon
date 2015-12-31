@@ -9,15 +9,14 @@ class Canvas:
         self.initial = initialCellSize;
         self.canvasSize = canvasSize; # To indicate current size of canvas
         self.upperLeftCorner = upperLeftCorner;
-        # To indicate current position of canvas   
-           
-        #genCells(self, upperLeftCorner);
+        # To indicate current position of canvas 
+          
+        self.genCells(); 
     def execute(self):
+        a = 1;
         #Step 1 - return a list of coordinates and a size to draw
-        self.genCells();
         #Step 2 - narrow down list of coordinates to just those that are some random subset for now, later representing the letter pattern
-        
-        
+
         #For all cells in this canvas, move and grow
         #Delete any cells that are off the canvas range
        # self.fs += self.growthRate;
@@ -26,14 +25,12 @@ class Canvas:
         x,y = (self.upperLeftCorner.x,self.upperLeftCorner.y);
         canvasRange = range(int(self.upperLeftCorner.x), int(self.upperLeftCorner.x) + self.canvasSize);
         # Checked and working: generating range from 0 to 599 (size is 600).
-        
-        # range from upperleftCorner x to upperleftCorner x + canvassize (from 0 to 600)
+
         everyPixel = [(r,c) for r in canvasRange for c in canvasRange];
-        # for r,c in everyPixel:
-        #     if r%self.fs ==0 and c%self.fs ==0:
-        #         self.cells[
-        #         self.cells[(r,c)] = Cell(r,c,self.fs);
-        self.cellList  = [Cell(r,c,self.fs) for r,c in everyPixel if r%self.fs ==0 and c%(self.fs*2)==0];
+        # Every 1x1 coordinate in the canvasRange
+        
+        self.cellList  = [Cell(PVector(r,c),self.fs) for r,c in everyPixel if r%self.fs ==0 and c%(self.fs*2)==0];
+        #Not causing error
         return self.cellList;
     
     def lerpCanvas(vector):
