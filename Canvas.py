@@ -1,15 +1,12 @@
 
 from Cell import Cell
 
-class Canvas:
+class Canvas(Cell):
+    #A Cell has a position, size. Use hasattr to determine if cell is a canvas
     
-    def __init__(self, initialCellSize = 5, growth = 0, canvasSize = 600,  upperLeftCorner = 0):
-        self.growthRate = growth;
-        self.fs = initialCellSize;
-        self.initial = initialCellSize;
-        self.canvasSize = canvasSize; # To indicate current size of canvas
-        self.upperLeftCorner = upperLeftCorner;
-        # To indicate current position of canvas 
+    def __init__(self, position, initialCellSize):
+        super().__init__(position,initialCellSize);
+        self.graduated = False;
         self.genCells(); 
         
     def execute(self):
@@ -27,7 +24,7 @@ class Canvas:
             #cell.position.y+=increase;
     
     def genCells(self):
-        x,y = unpack(self.upperLeftCorner);
+        x,y = unpack(self.position);
         canvasRange = range(int(x), int(x) + self.canvasSize);
         # Checked and working: generating range from 0 to 599 (size is 600).
 
@@ -39,39 +36,51 @@ class Canvas:
         
         return self.cellList;
     
-    def lerpCanvas(vector):
-        return None;
     
-    def getCanvasAsRects(self):
-        return ((r,c,self.fs) for r,c in self.cellList if not outOfBounds(r,c,self.fs));
-    
-    def makeChild(self, particularCell):
-        self.child = Canvas(self.initial, self.growthRate, particularCell.position, canvasSize = self.fs);
+    def graduationTime(self):
+        if self.dim > 100 and not self.graduated:
+            return True;
+        return False;
         
 
 class CanvasManager:
-    def __init__(self, initialCanvas):
-        self.canvasList = [initialCanvas];
+    #, Canvas(50,0,canvasSize,PVector(0,0))
+    def __init__(self, initialSize, totalBoardSpace):
+        #On init, generate a single cell for the board, then turn this cell into a canvas, then generate cells for the canvas
+        #Canvas created by consuming a cell. Canvas List created with initial cell entry
+        self.canvasList = [Canvas(Cell(PVector(0,0),initialSize))];
     
     def update(self, amountIncrease):
         for canvas in self.canvasList:
-            canvas.fs += amountIncrease;
-            canvas.updateCells(amountIncrease);
+            #Remove from consideration if canvas isn't on board
             if not canvasInBounds(canvas):
                 self.canvasList.remove(canvas);
-            else:
-            #If the canvas has a large enough figure size
-                if canvas.fs > 100:
-                    for cell in canvas.cellList:
-                        if cellInCanvasBounds(cell,canvas) and not cell.isCanvas:
-                            #Create new canvas for this cell
-                            cell.isCanvas = True;
-                            #initial size, growth rate, canvas size, upperleftcorner
-                            self.canvasList.append(Canvas(25, canvas.growthRate, cell.dim, cell.position));
-                        #Remove unused cell
-                        elif not cell.iscanvas and not cellInCanvasBounds(cell,canvas):
-                            canvas.cellList.remove(cell);
+                continue;
+            
+            #Establish canvas Size increase.
+            canvas.dim += amountIncrease;
+            #Propogate increase to cells of canvas
+            canvas.updateCells(amountIncrease);
+            
+            if canvas.graduationTime():
+                for cell in canvas.cellList:
+                    cell.update(amountIncrease);
+                for cell in canvas.cellList:
+                    #if the cell is in the canvas bounds (when is it not in bounds?)
+                    if cellInCanvasBounds(cell,canvas) and not cell.isCanvas:
+                        #Create new canvas for this cell
+                        cell.isCanvas = True;
+                        #initial size, growth rate, canvas size, upperleftcorner
+                        self.canvasList.append(Canvas(25, canvas.growthRate, cell.dim, cell.position));
+                    #Remove unused cell
+                    elif not cell.iscanvas and not cellInCanvasBounds(cell,canvas):
+                        canvas.cellList.remove(cell);
+                        
+            #If the cells in the canvas are larger than some threshold
+            if canvas.dim > 100:
+                
         return self.canvasList;
+
         
 def unpack(pvector):
     return (pvector.x,pvector.y);

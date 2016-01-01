@@ -25,7 +25,7 @@ def draw():
 class controlCenter:
     def __init__(self):
         #Create a Canvas Manager by passing an initial Canvas
-        self.canvasManager = CanvasManager(Canvas(50,0,canvasSize,PVector(0,0)));
+        self.canvasManager = CanvasManager(50, canvasSize);
         # figure size, growth rate, upperLeftCoord, canvasSize
 
     def execute(self, growing):
