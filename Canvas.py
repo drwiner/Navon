@@ -17,11 +17,14 @@ class Canvas:
         #Step 1 - return a list of coordinates and a size to draw
         #Step 2 - narrow down list of coordinates to just those that are some random subset for now, later representing the letter pattern
 
+    #TODO consider a recursive solution: each cell's position depends on changes to one cell (the top left).
+    # Each adjacent cell's location and size will depend on the single adjusted cell
+    # Change to top left --> no position change, just size change. Update adjacent cell positions. If out of bounds, 
     def updateCells(self,increase):
         for cell in self.cellList:
             cell.dim += increase;
-            cell.position.x+=increase;
-            cell.position.y+=increase;
+            #cell.position.x+=increase;
+            #cell.position.y+=increase;
     
     def genCells(self):
         x,y = unpack(self.upperLeftCorner);
@@ -64,7 +67,7 @@ class CanvasManager:
                             #Create new canvas for this cell
                             cell.isCanvas = True;
                             #initial size, growth rate, canvas size, upperleftcorner
-                            self.canvasList.append(Canvas(25, canvas.growth, cell.dim, cell.position));
+                            self.canvasList.append(Canvas(25, canvas.growthRate, cell.dim, cell.position));
                         #Remove unused cell
                         elif not cell.iscanvas and not cellInCanvasBounds(cell,canvas):
                             canvas.cellList.remove(cell);
