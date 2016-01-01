@@ -5,7 +5,7 @@ class Canvas(Cell):
     #A Cell has a position, size. Use hasattr to determine if cell is a canvas
     
     def __init__(self, position, initialCellSize):
-        super().__init__(position,initialCellSize);
+        super(Canvas,self).__init__(position,initialCellSize);
         self.graduated = False;
         self.genCells(); 
         
@@ -25,13 +25,13 @@ class Canvas(Cell):
     
     def genCells(self):
         x,y = unpack(self.position);
-        canvasRange = range(int(x), int(x) + self.canvasSize);
+        canvasRange = range(int(x), int(x) + self.dim);
         # Checked and working: generating range from 0 to 599 (size is 600).
 
         everyPixel = [(r,c) for r in canvasRange for c in canvasRange];
         # Every 1x1 coordinate in the canvasRange
         
-        self.cellList  = [Cell(PVector(r,c),self.fs) for r,c in everyPixel if r%self.fs ==0 and c%(self.fs)==0];
+        self.cellList  = [Cell(PVector(r,c),self.dim) for r,c in everyPixel if r%self.dim ==0 and c%(self.dim)==0];
         #Not causing error
         
         return self.cellList;
@@ -48,7 +48,7 @@ class CanvasManager:
     def __init__(self, initialSize, totalBoardSpace):
         #On init, generate a single cell for the board, then turn this cell into a canvas, then generate cells for the canvas
         #Canvas created by consuming a cell. Canvas List created with initial cell entry
-        self.canvasList = [Canvas(Cell(PVector(0,0),initialSize))];
+        self.canvasList = [Canvas(PVector(0,0),initialSize)];
     
     #For each canvas in the set of active canvi being drawn, see if any are out of bounds and remove them.
     #Make increase to canvas size and cells.
@@ -60,7 +60,7 @@ class CanvasManager:
         for canvas in self.canvasList:
             
             #Remove from consideration if canvas isn't on board
-            if not canvasInBounds(canvas):
+            if not cellInBounds(canvas):
                 self.canvasList.remove(canvas);
                 continue;
             
@@ -76,7 +76,7 @@ class CanvasManager:
             if canvas.graduationTime(): #Meaning that the cells that are in bounds should become canvi
                 for cell in canvas.cellList:
                     if cell.cellInBounds():
-                        cell = Canvas(cell); #This cell is now a canvas. 
+                        cell = Canvas(cell.position, cell.dim); #This cell is now a canvas. 
                         cell.graduated = True; #Cell can now longer be in graduationTime
                         self.canvasList.append(cell); #Added to list of active canvi
                 

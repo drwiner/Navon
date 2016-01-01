@@ -32,7 +32,7 @@ class controlCenter:
         #Update the canvas manager and pass back a list of active canvi
         activeCanvi = self.canvasManager.update(growing);
         for canvas in activeCanvi:
-            drawCanvas(canvas.execute(),canvas.fs);
+            drawCanvas(canvas.execute(),canvas.dim);
             #canvas.execute() returns a list of cells
         sleep(.1);
         return True;

@@ -1,4 +1,4 @@
-class Cell:
+class Cell(object):
     def __init__(self, positionVector, dim):
         self.position = positionVector;
         self.dim = dim;
