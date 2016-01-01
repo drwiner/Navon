@@ -50,58 +50,50 @@ class CanvasManager:
         #Canvas created by consuming a cell. Canvas List created with initial cell entry
         self.canvasList = [Canvas(Cell(PVector(0,0),initialSize))];
     
+    #For each canvas in the set of active canvi being drawn, see if any are out of bounds and remove them.
+    #Make increase to canvas size and cells.
+    #Check If canvas children should become canvi, and add them if they are in bounds.
     def update(self, amountIncrease):
+        
+        #For each canvas in the set of active canvi being drawn,
+        #____________________________________
         for canvas in self.canvasList:
+            
             #Remove from consideration if canvas isn't on board
             if not canvasInBounds(canvas):
                 self.canvasList.remove(canvas);
                 continue;
             
+            #Make increase to canvas size and cells
+            #_____________________________________
             #Establish canvas Size increase.
             canvas.dim += amountIncrease;
             #Propogate increase to cells of canvas
             canvas.updateCells(amountIncrease);
             
-            if canvas.graduationTime():
+            #Check if canvas children should become canvi, add them if they are in bounds
+            #_____________________________________
+            if canvas.graduationTime(): #Meaning that the cells that are in bounds should become canvi
                 for cell in canvas.cellList:
-                    cell.update(amountIncrease);
-                for cell in canvas.cellList:
-                    #if the cell is in the canvas bounds (when is it not in bounds?)
-                    if cellInCanvasBounds(cell,canvas) and not cell.isCanvas:
-                        #Create new canvas for this cell
-                        cell.isCanvas = True;
-                        #initial size, growth rate, canvas size, upperleftcorner
-                        self.canvasList.append(Canvas(25, canvas.growthRate, cell.dim, cell.position));
-                    #Remove unused cell
-                    elif not cell.iscanvas and not cellInCanvasBounds(cell,canvas):
-                        canvas.cellList.remove(cell);
-                        
-            #If the cells in the canvas are larger than some threshold
-            if canvas.dim > 100:
+                    if cell.cellInBounds():
+                        cell = Canvas(cell); #This cell is now a canvas. 
+                        cell.graduated = True; #Cell can now longer be in graduationTime
+                        self.canvasList.append(cell); #Added to list of active canvi
                 
         return self.canvasList;
 
-        
+#Helpful method for returning (x,y) tuple that is iterable from pvector
 def unpack(pvector):
     return (pvector.x,pvector.y);
 
-def cellInCanvasBounds(cell, canvas):
+#Helpful method for detecting if a cell, be it canvas or not, is on the board
+def cellInBounds(cell, maxCanvasSize = 599):
     x,y = unpack(cell.position);
-    Cx,Cy = unpack(canvas.upperLeftCorner);
-    if not canvasInBounds(canvas):
-        return False;
-    if inBounds(x,Cx,Cx + canvas.canvasSize) and inBounds(y,Cy,Cy+canvas.canvasSize):
-        return True;
-    return False;
-
-def canvasInBounds(canvas, maxCanvasSize = 599):
-    x,y = unpack(canvas.upperLeftCorner);
     if inBounds(x) and inBounds(y):
         return True;
-    dim = canvas.canvasSize;
-    if inBounds(x+dim-1) and inBounds(y+dim-1):
+    if inBounds(x+cell.dim-1) and inBounds(y+cell.dim-1):
         return True;
-    return False; #Canvas not in bounds
+    return False; #Cell not in bounds
 
 
 def inBounds(unit, low=0, up=599):
