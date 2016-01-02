@@ -31,7 +31,8 @@ class controlCenter:
     def execute(self, growing):
         #Update the canvas manager and pass back a list of active canvi
         activeCanvi = self.canvasManager.update(growing);
-        for canvas in activeCanvi:
+        for i, canvas in enumerate(activeCanvi):
+           #print(i);
             drawCanvas(canvas.execute(),canvas.dim);
             #canvas.execute() returns a list of cells
         sleep(.1);
@@ -55,7 +56,6 @@ def testDraw(listOfCells, cellSize):
             rect(cellX,cellY,cell.dim,cell.dim);
 
 def testDraw2(listOfCells, cellSize):
-    
     textSize(10);
     drawIt = True;
     lastX = 0;
@@ -72,7 +72,7 @@ def testDraw2(listOfCells, cellSize):
             fill(0,255,0,191);
             rect(cellX,cellY,cell.dim,cell.dim);
             fill(255);
-            text(str(cellX) + ' ' + str(cellY),cellX,cellY);
+            text(str(cellX) + ' ' + str(cellY),cellX+2,cellY+10);
             drawIt = False;
         else:
             drawIt = True;
