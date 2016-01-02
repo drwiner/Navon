@@ -75,7 +75,7 @@ class CanvasManager:
             #_____________________________________
             if canvas.graduationTime(): #Meaning that the cells that are in bounds should become canvi
                 for cell in canvas.cellList:
-                    if cell.cellInBounds():
+                    if cellInBounds(cell):
                         cell = Canvas(cell.position, cell.dim); #This cell is now a canvas. 
                         cell.graduated = True; #Cell can now longer be in graduationTime
                         self.canvasList.append(cell); #Added to list of active canvi
@@ -91,7 +91,14 @@ def cellInBounds(cell, maxCanvasSize = 599):
     x,y = unpack(cell.position);
     if inBounds(x) and inBounds(y):
         return True;
-    if inBounds(x+cell.dim-1) and inBounds(y+cell.dim-1):
+    bx,by = (x+cell.dim-1, y + cell.dim-1);
+    if inBounds(bs) and inBounds(by):
+        return True;
+    tx,ty = (x+cell.dim-1,y);
+    if inBounds(tx) and inBounds(ty):
+        return True;
+    lx,ly = (x,y+cell.dim-1);
+    if inBounds(lx) and inBounds(ly):
         return True;
     return False; #Cell not in bounds
 

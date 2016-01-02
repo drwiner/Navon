@@ -61,6 +61,7 @@ def testDraw2(listOfCells, cellSize):
     lastX = 0;
     for cell in listOfCells:
         cellX,cellY = unpack(cell.position);
+        print(cellX,cellY);
         if  cellX > lastX:
             if not drawIt:
                 drawIt = True;
@@ -76,5 +77,5 @@ def testDraw2(listOfCells, cellSize):
         else:
             drawIt = True;
         
-       # print(cellX,cellY);
+        
             
