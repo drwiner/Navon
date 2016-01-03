@@ -19,14 +19,23 @@ class Canvas(Cell):
     # Each adjacent cell's location and size will depend on the single adjusted cell
     # Change to top left --> no position change, just size change. Update adjacent cell positions. If out of bounds, 
     def updateCells(self,increase):
+        x,y = unpack(self.position);
+        #former position
+        oldPosition = self.position;
+      #  newPosition = PVector(self.position.x + increase, self.position.y + increase);
+        newPosition = PVector(0,0);
+        diff = PVector(0,0);
+        diff = PVector.sub(newPosition,oldPosition);
+        #print(diff);
+        self.position = newPosition;
+        self.dim += increase;
         #self.childCellSize;
         #self.position
         #self.dim
         #self.grandParent
         for cell in self.cellList:
             cell.dim += increase;
-            #cell.position.x+=increase;
-            #cell.position.y+=increase;
+            cell.position.add(PVector(increase,increase));
     
     def genCells(self):
         x,y = unpack(self.position);
@@ -66,7 +75,7 @@ class CanvasManager:
             #Make increase to canvas size and cells
             #_____________________________________
             #Establish canvas Size increase.
-            canvas.dim += amountIncrease;
+           # canvas.dim += amountIncrease; --> don't update here, update when you update the canvas, duh.
             #Propogate increase to cells of canvas
             canvas.updateCells(amountIncrease);
             
