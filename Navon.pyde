@@ -17,7 +17,7 @@ def draw():
     background(0);
     growIt = 0;
     if keyPressed:
-        growIt = 5;
+        growIt = 12;
     main.execute(growIt);
     #rect(20,0,40,40);
 
@@ -61,7 +61,7 @@ def testDraw2(listOfCells, cellSize):
     lastX = 0;
     for cell in listOfCells:
         cellX,cellY = unpack(cell.position);
-        print(cellX,cellY);
+        #print(cellX,cellY);
         if  cellX > lastX:
             if not drawIt:
                 drawIt = True;

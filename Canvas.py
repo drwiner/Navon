@@ -19,37 +19,31 @@ class Canvas(Cell):
     # Each adjacent cell's location and size will depend on the single adjusted cell
     # Change to top left --> no position change, just size change. Update adjacent cell positions. If out of bounds, 
     def updateCells(self,increase):
-        x,y = unpack(self.position);
-        #former position
-        oldPosition = self.position;
-      #  newPosition = PVector(self.position.x + increase, self.position.y + increase);
-        newPosition = PVector(0,0);
-        diff = PVector(0,0);
-        diff = PVector.sub(newPosition,oldPosition);
-        #print(diff);
-        self.position = newPosition;
-        self.dim += increase;
-        #self.childCellSize;
-        #self.position
-        #self.dim
-        #self.grandParent
-        for cell in self.cellList:
-            cell.dim += increase;
-            cell.position.add(PVector(increase,increase));
+        if increase > 0:
+            self.dim += int(increase); # The canvas is now larger.
+            distributedIncrease = int(increase/sqrt(len(self.cellList)));
+            #print(distributedIncrease);
+            self.childCellSize += distributedIncrease; #The children are larger
+            canvasRange = self.getRange();
+            newPositions = (PVector(r,c) for r in canvasRange for c in canvasRange if r%self.childCellSize==0 and c%self.childCellSize ==0)
+            for cell in self.cellList:
+                cell.position = newPositions.next();
+                #print(cell.position);
+                if isinstance(cell,Canvas):
+                    cell.updateCells(int(distributedIncrease));
+                else:
+                    cell.dim = self.childCellSize;
+                
     
     def genCells(self):
-        x,y = unpack(self.position);
-        canvasRange = range(int(x), int(x) + self.dim);
+        canvasRange = self.getRange();
         # Checked and working: generating range from 0 to 599 (size is 600).
 
-        everyPixel = [(r,c) for r in canvasRange for c in canvasRange];
-        # Every 1x1 coordinate in the canvasRange
-        
-        self.cellList  = [Cell(PVector(r,c),self.childCellSize) for r,c in everyPixel if r%self.childCellSize ==0 and c%(self.childCellSize)==0];
+        self.cellList  = [Cell(PVector(r,c),self.childCellSize) for r in canvasRange for c in canvasRange if r%self.childCellSize ==0 and c%(self.childCellSize)==0];
         #Creation of cavnas' children, Not causing error
         
         return self.cellList;
-        
+
 
 class CanvasManager:
     #, Canvas(50,0,canvasSize,PVector(0,0))
@@ -85,7 +79,7 @@ class CanvasManager:
                 canvas.grandParent = True;
                 for cell in canvas.cellList:
                     if cellInBounds(cell):
-                        cell = Canvas(cell.position, cell.dim); #This cell is now a canvas. 
+                        cell = Canvas(cell.position, 1, cell.dim); #This cell is now a canvas. 
                         self.canvasList.append(cell); #Added to list of active canvi
                 
         return self.canvasList;
