@@ -17,7 +17,7 @@ def draw():
     background(0);
     growIt = 0;
     if keyPressed:
-        growIt = 12;
+        growIt = 48;
     main.execute(growIt);
     #rect(20,0,40,40);
 
@@ -32,7 +32,7 @@ class controlCenter:
         #Update the canvas manager and pass back a list of active canvi
         activeCanvi = self.canvasManager.update(growing);
         for i, canvas in enumerate(activeCanvi):
-           #print(i);
+            print(i);
             drawCanvas(canvas.execute(),canvas.dim);
             #canvas.execute() returns a list of cells
         sleep(.1);

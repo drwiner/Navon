@@ -75,12 +75,14 @@ class CanvasManager:
             
             #Check if canvas children should become canvi, add them if they are in bounds
             #_____________________________________
-            if canvas.childCellSize > 100 and not canvas.grandParent:
+            if canvas.childCellSize >= 144 and not canvas.grandParent:
                 canvas.grandParent = True;
                 for cell in canvas.cellList:
                     if cellInBounds(cell):
-                        cell = Canvas(cell.position, 1, cell.dim); #This cell is now a canvas. 
+                        cell = Canvas(cell.position, 12, cell.dim); #This cell is now a canvas. 
                         self.canvasList.append(cell); #Added to list of active canvi
+                self.canvasList.remove(canvas);
+                #BECAUSE, the children of this canvas are canvi themselves... so no longer need to draw them, just the grandchildren.
                 
         return self.canvasList;
 
@@ -94,7 +96,7 @@ def cellInBounds(cell, maxCanvasSize = 599):
     if inBounds(x) and inBounds(y):
         return True;
     bx,by = (x+cell.dim-1, y + cell.dim-1);
-    if inBounds(bs) and inBounds(by):
+    if inBounds(bx) and inBounds(by):
         return True;
     tx,ty = (x+cell.dim-1,y);
     if inBounds(tx) and inBounds(ty):
