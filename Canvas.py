@@ -1,5 +1,6 @@
 
 from Cell import Cell
+from Cell import patternA
 
 class Canvas(Cell):
     #A Cell has a position, size. Use hasattr to determine if cell is a canvas
@@ -8,6 +9,7 @@ class Canvas(Cell):
         super(Canvas,self).__init__(position,initialCanvasSize);
         self.childCellSize = initialCellSize;
         self.genCells();
+        self.numRows = int(sqrt(len(self.cellList)));
         self.grandParent = False;
         
     def execute(self):
@@ -21,8 +23,7 @@ class Canvas(Cell):
     def updateCells(self,increase):
         if increase > 0:
             self.dim += int(increase); # The canvas is now larger.
-            distributedIncrease = int(increase/sqrt(len(self.cellList)));
-            #print(distributedIncrease);
+            distributedIncrease = int(increase/self.numRows); # The increase divided by the number of cells in the row/col. Thus, increase should be dividible into num rows...
             self.childCellSize += distributedIncrease; #The children are larger
             canvasRange = self.getRange();
             newPositions = (PVector(r,c) for r in canvasRange for c in canvasRange if r%self.childCellSize==0 and c%self.childCellSize ==0)
@@ -34,15 +35,19 @@ class Canvas(Cell):
                 else:
                     cell.dim = self.childCellSize;
                 
-    
+    ### CALLED in INIT ###
     def genCells(self):
         canvasRange = self.getRange();
         # Checked and working: generating range from 0 to 599 (size is 600).
-
+        
         self.cellList  = [Cell(PVector(r,c),self.childCellSize) for r in canvasRange for c in canvasRange if r%self.childCellSize ==0 and c%(self.childCellSize)==0];
+        for i in self.cellList:
+            print(i.position);
         #Creation of cavnas' children, Not causing error
         
         return self.cellList;
+
+
 
 
 class CanvasManager:
@@ -69,7 +74,6 @@ class CanvasManager:
             #Make increase to canvas size and cells
             #_____________________________________
             #Establish canvas Size increase.
-           # canvas.dim += amountIncrease; --> don't update here, update when you update the canvas, duh.
             #Propogate increase to cells of canvas
             canvas.updateCells(amountIncrease);
             

@@ -2,6 +2,8 @@ from Canvas import Canvas
 from Canvas import CanvasManager
 from time import sleep;
 from Canvas import unpack;
+from random import random;
+from math import floor
 
 canvasSize = 600;
 twiceCanvas = canvasSize*2;
@@ -25,19 +27,21 @@ def draw():
 class controlCenter:
     def __init__(self):
         #Create a Canvas Manager by passing an initial Canvas
-        self.canvasManager = CanvasManager(50, canvasSize);
+        self.canvasManager = CanvasManager(48, canvasSize);
         # figure size, growth rate, upperLeftCoord, canvasSize
 
     def execute(self, growing):
         #Update the canvas manager and pass back a list of active canvi
         activeCanvi = self.canvasManager.update(growing);
         for i, canvas in enumerate(activeCanvi):
-            print(i);
+            ## THIS IS USEFUL: print(i);
             drawCanvas(canvas.execute(),canvas.dim);
             #canvas.execute() returns a list of cells
-        sleep(.1);
+        #sleep(.1);
         return True;
 
+
+############ DRAWING METHODS ############
 def drawCanvas(listOfCells,cellSize):
     testDraw2(listOfCells, cellSize);
         
@@ -57,8 +61,10 @@ def testDraw(listOfCells, cellSize):
 
 def testDraw2(listOfCells, cellSize):
     textSize(10);
+    colorLevel = 50;
     drawIt = True;
     lastX = 0;
+    print(len(listOfCells));
     for cell in listOfCells:
         cellX,cellY = unpack(cell.position);
         #print(cellX,cellY);
@@ -69,7 +75,8 @@ def testDraw2(listOfCells, cellSize):
                 drawIt = False;
             lastX = cellX;
         if drawIt:
-            fill(0,255,0,191);
+            colorLevel = colorLevel + 2;
+            fill(0,255,0,colorLevel);
             rect(cellX,cellY,cell.dim,cell.dim);
             fill(255);
             text(str(cellX) + ' ' + str(cellY),cellX+2,cellY+10);
@@ -77,5 +84,13 @@ def testDraw2(listOfCells, cellSize):
         else:
             drawIt = True;
         
-        
+def randomDraw(listOfCells, cellSize):
+    randomCoords = [int(floor(random()*12)) for x in range(0,6)];
+    print(randomCoords);
+    for i,cell in enumerate(listOfCells):
+        if i in randomCoords:
+            cellX,cellY = unpack(cell.position);
+            fill(0,255,0,191);
+            rect(cellX,cellY,cell.dim,cell.dim);
+    
             
