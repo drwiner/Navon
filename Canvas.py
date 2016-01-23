@@ -36,23 +36,36 @@ class Canvas(Cell):
             print("center ", self.centerInOrder);
             self.lastCenterPosition = self.getCenter().position;
             print("before ", self.lastCenterPosition);
+            
             #Two phases: first, calculate displacement of center. subtract from origin. second, calculate journey to top left. Divide journey into bouts of 12 by 12. 
             self.dim += int(increase); # The canvas is now larger.
             distributedIncrease = int(increase/self.numRows); # The increase divided by the number of cells in the row/col. Thus, increase should be dividible into num rows...
             self.childCellSize += distributedIncrease; #The children are larger
             self.updateCellPositions(self.getRange(),distributedIncrease);
-            #calculate displacement
-            print("after ", self.getCenter().position);
             print("displacement ", self.displacement());
             self.position.add(self.displacement());
+            #Also should add "journey" here. before reupdating cells. Now, what 
+            
+            
+            self.updateCellPositions(self.getRange(),0);
+            print("after ", self.getCenter().position);
+            print("new Position ", self.position);
+            
+            totalJourney = PVector.mult(self.getCenter().position,-1);
+            dividedJourney = PVector.div(totalJourney,12);
+            dividedJourney.x = floor(dividedJourney.x);
+            dividedJourney.y = floor(dividedJourney.y);
+            
+            print(dividedJourney);
+            self.position.add(dividedJourney);
             self.updateCellPositions(self.getRange(),0);
             print("after2 ", self.getCenter().position);
-            print("new Position ", self.position);
+            print("new Position 2 ", self.position);
             
     #Returns the cell at index centerInOrder
     
     def updateCellPositions(self, canvasRange, distributedIncrease):
-        newPositions = (PVector(r,c) for r in canvasRange for c in canvasRange if (r-self.position.x)%self.childCellSize==0 and (c-self.position.y)%self.childCellSize ==0)
+        newPositions = (PVector(r,c) for r in canvasRange for c in canvasRange if (r-self.position.x)%self.childCellSize==0 and (c-self.position.y)%self.childCellSize ==0);
         for cell in self.cellList:
             cell.position = newPositions.next(); 
             #print(cell.position);
