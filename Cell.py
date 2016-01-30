@@ -1,3 +1,5 @@
+from math import floor
+
 class Cell(object):
     def __init__(self, positionVector, dim):
         self.position = positionVector;
@@ -34,3 +36,10 @@ def coordToOrder(coord,numRows):
     x,y = coord;
     return x*numRows + y;
 
+def orderToCoord(order,numRows,delta):
+    x = floor(float(order) / float(numRows));
+    y = order - (numRows * x);
+    x = x + (x * delta);
+    y = y + (y * delta);
+    print(x,y);
+    return PVector(float(x),float(y));

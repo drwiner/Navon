@@ -21,7 +21,7 @@ def draw():
     growIt = 0;
     if keyPressed:
         growIt = 204;
-    main.execute(growIt);
+        main.execute(growIt);
     #rect(20,0,40,40);
 
     
@@ -36,7 +36,7 @@ class controlCenter:
         activeCanvi = self.canvasManager.update(growing);
         for i, canvas in enumerate(activeCanvi):
             ## THIS IS USEFUL: 
-            print(i);
+            #print(i);
             drawCanvas(canvas.execute(),canvas.dim,canvas.pattern);
             #canvas.execute() returns a list of cells
         #sleep(.1);
@@ -108,7 +108,7 @@ def patternDraw(listOfCells, cellSize, pattern):
             colorLevel = colorLevel + 2;
             fill(0,255,0,colorLevel);
             if not giveSizeOnce:
-                print("cell.dim, ", cell.dim, " canvas.dim, ", cellSize);
+                #print("cell.dim, ", cell.dim, " canvas.dim, ", cellSize);
                 giveSizeOnce = True;
             rect(cellX,cellY,cell.dim,cell.dim);
             fill(255);

@@ -3,6 +3,7 @@ from math import floor
 from Cell import Cell
 from Cell import patternA
 from Cell import coordToOrder
+from Cell import orderToCoord
 
 class Canvas(Cell):
     #A Cell has a position, size. Use hasattr to determine if cell is a canvas
@@ -14,7 +15,7 @@ class Canvas(Cell):
         self.numRows = int(sqrt(len(self.cellList)));
         self.grandParent = False;
         self.genPattern();
-        self.pickRandomTarget();
+        #self.pickRandomTarget();
         
     def execute(self):
         return self.cellList;
@@ -34,7 +35,7 @@ class Canvas(Cell):
     # Change to top left --> no position change, just size change. Update adjacent cell positions. If out of bounds, 
     def updateCells(self,increase):
         if increase > 0:
-            print("center, index cellList ", self.centerInOrder);
+            print("center, index cellList ", self.center);
             self.lastCenterPosition = self.getCenter().position;
             print("before ", self.lastCenterPosition);
             
@@ -42,13 +43,20 @@ class Canvas(Cell):
             self.dim += int(increase); # The canvas is now larger.
             distributedIncrease = int(increase/self.numRows); # The increase divided by the number of cells in the row/col. Thus, increase should be dividible into num rows...
             self.childCellSize += distributedIncrease; #The children are larger
-            self.updateCellPositions(self.getRangeX(), self.getRangeY(),distributedIncrease);
+            ###############
+            #displacement = PVector.sub(self.lastCenterPosition, orderToCoord(self.centerInOrder,12,distributedIncrease));
+            self.genCells();
+            ###############
+            
+            #TODO: add new position to center only so that we don't have to gen cells.
             print("displacement ", self.displacement());
+            print("new displacement ", displacement);
             self.position.add(self.displacement());
             #Also should add "journey" here. before reupdating cells. Now, what 
             
-            
-            self.updateCellPositions(self.getRangeX(), self.getRangeY(),0);
+            ###############
+            self.genCells();
+            ###############
             print("after ", self.getCenter().position);
             print("new Position ", self.position);
             
@@ -60,21 +68,13 @@ class Canvas(Cell):
             
             print(dividedJourney);
             self.position.add(dividedJourney);
-            self.updateCellPositions(self.getRangeX(), self.getRangeY(),0);
+            ###############
+            self.genCells();
+            ###############
             print("after2 ", self.getCenter().position);
             print("new Position 2 ", self.position);
             
-    #Returns the cell at index centerInOrder
-    
-    def updateCellPositions(self, canvasRangeX, canvasRangeY, distributedIncrease):
-        newPositions = (PVector(r,c) for r in canvasRangeX for c in canvasRangeY if (r-self.position.x)%self.childCellSize==0 and (c-self.position.y)%self.childCellSize ==0);
-        for cell in self.cellList:
-            cell.position = newPositions.next(); 
-            #print(cell.position);
-            if isinstance(cell,Canvas):
-                cell.updateCells(int(distributedIncrease));
-            else:
-                cell.dim = self.childCellSize;
+
     
     def getCenter(self):
         return self.cellList[self.centerInOrder];
@@ -85,9 +85,13 @@ class Canvas(Cell):
         self.pattern = [coordToOrder(i,12) for i in pA];
     
     #Selects a random integer from the pattern, a list of integers
+    #Returns a cell in canvas that is the center for all canvi
+    #Called by Canvas Manager
     def pickRandomTarget(self):
         spaceSize = len(self.pattern);
         self.centerInOrder = self.pattern[int(floor(random()*spaceSize))];
+        self.center = self.cellList[self.centerInOrder]
+        return (self.center, self.centerInOrder);
         
     def displacement(self):
         return PVector.sub(self.lastCenterPosition, self.getCenter().position);
@@ -98,12 +102,35 @@ class CanvasManager:
         #On init, generate a single cell for the board, then turn this cell into a canvas, then generate cells for the canvas
         #Canvas created by consuming a cell. Canvas List created with initial cell entry
         self.canvasList = [Canvas(PVector(0,0),initialSize,totalBoardSpace)]; #Canvas that takes entire board
+        self.pickCellFromCanvas();
+        
+
+    def pickCellFromCanvas(self):
+        spaceSize = len(self.canvasList);
+        randomCanvas = self.canvasList[int(floor(random() * spaceSize))];
+        self.center, self.centerInOrder = randomCanvas.pickRandomTarget();
+        
+    def updateCenter(self, amountIncrease):
+        #Calculate new position of center
+        distributedIncrease = amountIncrease/12;
+        
+        #The amount that all canvi should be moved, is the amount the center will move
+        displacement = PVector.sub(self.center.position,orderToCoord(self.centerInOrder, 12, distributedIncrease));
+        
+        #The amount to get teh center cell to the center of board
+        journey = PVector.sub(PVector(300,300),self.center.position);
+        journey.div(12);
+        
+        return PVector.add(displacement, journey);
+        
     
     #THIS IS CALLED EVERY FRAME
     #For each canvas in the set of active canvi being drawn, see if any are out of bounds and remove them.
     #Make increase to canvas size and cells.
     #Check If canvas children should become canvi, and add them if they are in bounds.
     def update(self, amountIncrease):
+        
+        #TODO: Need to calculate new position of center FIRST, because all updates are made with respect to this. We should be able to calculate this
         
         canviToAdd = [];
         #For each canvas in the set of active canvi being drawn,
@@ -119,21 +146,23 @@ class CanvasManager:
             #_____________________________________
             #Establish canvas Size increase.
             #Propogate increase to cells of canvas
+            
             canvas.updateCells(amountIncrease);
             
             #Check if canvas children should become canvi, add them if they are in bounds
             #_____________________________________
             if canvas.childCellSize >= 84 and not canvas.grandParent:
                 canvas.grandParent = True;
+                print("_________________________________________________");
                 for i,cell in enumerate(canvas.cellList):
                     if cellInBounds(cell) and i in canvas.pattern:
-                       #print(i, ", creating new canvas from cell, its member size is: ", int(floor(canvas.childCellSize/12)),  " and here's the position: ", cell.position, "  and here's the cell.dim ", cell.dim); 
+                    #print(i, ", creating new canvas from cell, its member size is: ", int(floor(canvas.childCellSize/12)),  " and here's the position: ", cell.position, "  and here's the cell.dim ", cell.dim); 
                         # initial cell size should be 1/12 OF the new canvas size. the new canvas size IS the size of the cell.
                         cell = Canvas(cell.position, int(floor(canvas.childCellSize/12)), cell.dim); #This cell is now a canvas. 
-                       # print(i, ", after creating, its size is: ", cell.childCellSize,  " and here's the position: ", cell.position, "  and here's the cell.dim ", cell.dim); 
-                        canviToAdd.append(cell);
-                        #self.canvasList.append(cell); #Added to list of active canvi
-                self.canvasList.remove(canvas); 
+                    # print(i, ", after creating, its size is: ", cell.childCellSize,  " and here's the position: ", cell.position, "  and here's the cell.dim ", cell.dim); 
+                    canviToAdd.append(cell);
+                    #self.canvasList.append(cell); #Added to list of active canvi
+            self.canvasList.remove(canvas); 
         #Do not start updating increase for the NEW canvi, doy
         if len(canviToAdd) > 0:
             self.canvasList.extend(canviToAdd);
