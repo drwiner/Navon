@@ -25,7 +25,7 @@ class Canvas(Cell):
     def genCells(self):
         canvasRange = self.getRange();
         # Checked and working: generating range from 0 to 599 (size is 600).
-        self.cellList  = [Cell(PVector(r,c),self.childCellSize) for r in canvasRange for c in canvasRange if r%self.childCellSize ==0 and c%(self.childCellSize)==0];
+        self.cellList  = [Cell(PVector(r,c),self.childCellSize) for r in canvasRange for c in canvasRange if (r-self.position.x)%self.childCellSize ==0 and (c-self.position.y)%(self.childCellSize)==0];
         #Creation of cavnas' children, Not causing error
         return self.cellList;
     
@@ -119,13 +119,13 @@ class CanvasManager:
             
             #Check if canvas children should become canvi, add them if they are in bounds
             #_____________________________________
-#             if canvas.childCellSize >= 144 and not canvas.grandParent:
-#                 canvas.grandParent = True;
-#                 for cell in canvas.cellList:
-#                     if cellInBounds(cell):
-#                         cell = Canvas(cell.position, 12, cell.dim); #This cell is now a canvas. 
-#                         self.canvasList.append(cell); #Added to list of active canvi
-#                 self.canvasList.remove(canvas);
+            if canvas.childCellSize >= 84 and not canvas.grandParent:
+                canvas.grandParent = True;
+                for cell in canvas.cellList:
+                    if cellInBounds(cell):
+                        cell = Canvas(cell.position, int(floor(canvas.childCellSize/12)), cell.dim); #This cell is now a canvas. 
+                        self.canvasList.append(cell); #Added to list of active canvi
+                self.canvasList.remove(canvas);
                 #BECAUSE, the children of this canvas are canvi themselves... so no longer need to draw them, just the grandchildren.
                 
         return self.canvasList;

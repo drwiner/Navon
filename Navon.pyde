@@ -104,7 +104,7 @@ def patternDraw(listOfCells, cellSize, pattern):
             fill(0,255,0,colorLevel);
             rect(cellX,cellY,cell.dim,cell.dim);
             fill(255);
-            text(str(cellX) + ' ' + str(cellY),cellX+2,cellY+10);
+            #text(str(cellX) + ' ' + str(cellY),cellX+2,cellY+10);
         
 
         
