@@ -23,9 +23,10 @@ class Canvas(Cell):
                 
     ### CALLED in INIT ###
     def genCells(self):
-        canvasRange = self.getRange();
+        canvasRangeX = self.getRangeX();
+        canvasRangeY = self.getRangeY();
         # Checked and working: generating range from 0 to 599 (size is 600).
-        self.cellList  = [Cell(PVector(r,c),self.childCellSize) for r in canvasRange for c in canvasRange if (r-self.position.x)%self.childCellSize ==0 and (c-self.position.y)%(self.childCellSize)==0];
+        self.cellList  = [Cell(PVector(r,c),self.childCellSize) for r in canvasRangeX for c in canvasRangeY if (r-self.position.x)%self.childCellSize ==0 and (c-self.position.y)%(self.childCellSize)==0];
         #Creation of cavnas' children, Not causing error
         return self.cellList;
     
@@ -41,13 +42,13 @@ class Canvas(Cell):
             self.dim += int(increase); # The canvas is now larger.
             distributedIncrease = int(increase/self.numRows); # The increase divided by the number of cells in the row/col. Thus, increase should be dividible into num rows...
             self.childCellSize += distributedIncrease; #The children are larger
-            self.updateCellPositions(self.getRange(),distributedIncrease);
+            self.updateCellPositions(self.getRangeX(), self.getRangeY(),distributedIncrease);
             print("displacement ", self.displacement());
             self.position.add(self.displacement());
             #Also should add "journey" here. before reupdating cells. Now, what 
             
             
-            self.updateCellPositions(self.getRange(),0);
+            self.updateCellPositions(self.getRangeX(), self.getRangeY(),0);
             print("after ", self.getCenter().position);
             print("new Position ", self.position);
             
@@ -59,14 +60,14 @@ class Canvas(Cell):
             
             print(dividedJourney);
             self.position.add(dividedJourney);
-            self.updateCellPositions(self.getRange(),0);
+            self.updateCellPositions(self.getRangeX(), self.getRangeY(),0);
             print("after2 ", self.getCenter().position);
             print("new Position 2 ", self.position);
             
     #Returns the cell at index centerInOrder
     
-    def updateCellPositions(self, canvasRange, distributedIncrease):
-        newPositions = (PVector(r,c) for r in canvasRange for c in canvasRange if (r-self.position.x)%self.childCellSize==0 and (c-self.position.y)%self.childCellSize ==0);
+    def updateCellPositions(self, canvasRangeX, canvasRangeY, distributedIncrease):
+        newPositions = (PVector(r,c) for r in canvasRangeX for c in canvasRangeY if (r-self.position.x)%self.childCellSize==0 and (c-self.position.y)%self.childCellSize ==0);
         for cell in self.cellList:
             cell.position = newPositions.next(); 
             #print(cell.position);
@@ -126,10 +127,10 @@ class CanvasManager:
                 canvas.grandParent = True;
                 for i,cell in enumerate(canvas.cellList):
                     if cellInBounds(cell) and i in canvas.pattern:
-                        print(i, ", creating new canvas from cell, its member size is: ", int(floor(canvas.childCellSize/12)),  " and here's the position: ", cell.position, "  and here's the cell.dim ", cell.dim); 
+                       #print(i, ", creating new canvas from cell, its member size is: ", int(floor(canvas.childCellSize/12)),  " and here's the position: ", cell.position, "  and here's the cell.dim ", cell.dim); 
                         # initial cell size should be 1/12 OF the new canvas size. the new canvas size IS the size of the cell.
                         cell = Canvas(cell.position, int(floor(canvas.childCellSize/12)), cell.dim); #This cell is now a canvas. 
-                        print(i, ", after creating, its size is: ", cell.childCellSize/12,  " and here's the position: ", cell.position, "  and here's the cell.dim ", cell.dim); 
+                       # print(i, ", after creating, its size is: ", cell.childCellSize,  " and here's the position: ", cell.position, "  and here's the cell.dim ", cell.dim); 
                         canviToAdd.append(cell);
                         #self.canvasList.append(cell); #Added to list of active canvi
                 self.canvasList.remove(canvas); 

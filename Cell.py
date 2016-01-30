@@ -3,8 +3,11 @@ class Cell(object):
         self.position = positionVector;
         self.dim = dim;
         
-    def getRange(self):
+    def getRangeX(self):
         return range(int(self.position.x), int(self.position.x) + self.dim);
+    
+    def getRangeY(self):
+        return range(int(self.position.y), int(self.position.y) + self.dim);
 
     def update(self):
         if (hasattr(self, desiredPosition)):
