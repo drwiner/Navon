@@ -33,7 +33,7 @@ class Canvas(Cell):
     # Change to top left --> no position change, just size change. Update adjacent cell positions. If out of bounds, 
     def updateCells(self,increase):
         if increase > 0:
-            print("center ", self.centerInOrder);
+            print("center, index cellList ", self.centerInOrder);
             self.lastCenterPosition = self.getCenter().position;
             print("before ", self.lastCenterPosition);
             
@@ -51,6 +51,7 @@ class Canvas(Cell):
             print("after ", self.getCenter().position);
             print("new Position ", self.position);
             
+            #Replace divided journey with journey that is getting center of canvas (position + 0.5 *canvas.dim) to center of board (boardSize/2,boardSize/2)
             totalJourney = PVector.mult(self.getCenter().position,-1);
             dividedJourney = PVector.div(totalJourney,12);
             dividedJourney.x = floor(dividedJourney.x);
@@ -91,17 +92,19 @@ class Canvas(Cell):
         return PVector.sub(self.lastCenterPosition, self.getCenter().position);
 
 class CanvasManager:
-    #, Canvas(50,0,canvasSize,PVector(0,0))
+    #THIS ONLY HAPPENS ON FIRST INIT
     def __init__(self, initialSize, totalBoardSpace):
         #On init, generate a single cell for the board, then turn this cell into a canvas, then generate cells for the canvas
         #Canvas created by consuming a cell. Canvas List created with initial cell entry
         self.canvasList = [Canvas(PVector(0,0),initialSize,totalBoardSpace)]; #Canvas that takes entire board
     
+    #THIS IS CALLED EVERY FRAME
     #For each canvas in the set of active canvi being drawn, see if any are out of bounds and remove them.
     #Make increase to canvas size and cells.
     #Check If canvas children should become canvi, and add them if they are in bounds.
     def update(self, amountIncrease):
         
+        canviToAdd = [];
         #For each canvas in the set of active canvi being drawn,
         #____________________________________
         for canvas in self.canvasList:
@@ -121,13 +124,18 @@ class CanvasManager:
             #_____________________________________
             if canvas.childCellSize >= 84 and not canvas.grandParent:
                 canvas.grandParent = True;
-                for cell in canvas.cellList:
-                    if cellInBounds(cell):
+                for i,cell in enumerate(canvas.cellList):
+                    if cellInBounds(cell) and i in canvas.pattern:
+                        print(i, ", creating new canvas from cell, its member size is: ", int(floor(canvas.childCellSize/12)),  " and here's the position: ", cell.position, "  and here's the cell.dim ", cell.dim); 
+                        # initial cell size should be 1/12 OF the new canvas size. the new canvas size IS the size of the cell.
                         cell = Canvas(cell.position, int(floor(canvas.childCellSize/12)), cell.dim); #This cell is now a canvas. 
-                        self.canvasList.append(cell); #Added to list of active canvi
-                self.canvasList.remove(canvas);
-                #BECAUSE, the children of this canvas are canvi themselves... so no longer need to draw them, just the grandchildren.
-                
+                        print(i, ", after creating, its size is: ", cell.childCellSize/12,  " and here's the position: ", cell.position, "  and here's the cell.dim ", cell.dim); 
+                        canviToAdd.append(cell);
+                        #self.canvasList.append(cell); #Added to list of active canvi
+                self.canvasList.remove(canvas); 
+        #Do not start updating increase for the NEW canvi, doy
+        if len(canviToAdd) > 0:
+            self.canvasList.extend(canviToAdd);
         return self.canvasList;
 
 #Helpful method for returning (x,y) tuple that is iterable from pvector
