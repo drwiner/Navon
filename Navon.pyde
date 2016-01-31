@@ -47,54 +47,7 @@ class controlCenter:
 def drawCanvas(listOfCells,cellSize, pattern):
     #testDraw2(listOfCells, cellSize);
     patternDraw(listOfCells,cellSize, pattern);
-        
-def realDraw(listOfCells):
-    fill(0,255,0,191);
-    for cell in listOfCells:
-        cellX,cellY = unpack(cell.position);
-        print(cellX,cellY,cell.dim);
-        rect(cellX,cellY,cell.dim,cell.dim);
-                
-def testDraw(listOfCells, cellSize):
-    fill(0,255,0,191);
-    for cell in listOfCells:
-        cellX,cellY = unpack(cell.position);
-        if cellX % (cellSize*2) == 0 and cellY%(cellSize*2) == 0:
-            rect(cellX,cellY,cell.dim,cell.dim);
 
-def testDraw2(listOfCells, cellSize):
-    textSize(10);
-    colorLevel = 50;
-    drawIt = True;
-    lastX = 0;
-    for cell in listOfCells:
-        cellX,cellY = unpack(cell.position);
-        #print(cellX,cellY);
-        if  cellX > lastX:
-            if not drawIt:
-                drawIt = True;
-            else:
-                drawIt = False;
-            lastX = cellX;
-        if drawIt:
-            colorLevel = colorLevel + 2;
-            fill(0,255,0,colorLevel);
-            rect(cellX,cellY,cell.dim,cell.dim);
-            fill(255);
-            text(str(cellX) + ' ' + str(cellY),cellX+2,cellY+10);
-            drawIt = False;
-        else:
-            drawIt = True;
-        
-def randomDraw(listOfCells, cellSize):
-    randomCoords = [int(floor(random()*12)) for x in range(0,6)];
-    print(randomCoords);
-    for i,cell in enumerate(listOfCells):
-        if i in randomCoords:
-            cellX,cellY = unpack(cell.position);
-            fill(0,255,0,191);
-            rect(cellX,cellY,cell.dim,cell.dim);
-    
 def patternDraw(listOfCells, cellSize, pattern):
     #listOfCells = the list of cells in a particular canvas
     #cellSize = the size of the canvas. not needed since we draw at every cell position in designated cell size.
@@ -112,7 +65,7 @@ def patternDraw(listOfCells, cellSize, pattern):
                 giveSizeOnce = True;
             rect(cellX,cellY,cell.dim,cell.dim);
             fill(255);
-            text(str(cellX) + ' ' + str(cellY),cellX+2,cellY+10);
+            #text(str(cellX) + ' ' + str(cellY),cellX+2,cellY+10);
         
 
         

@@ -38,7 +38,7 @@ class Canvas(Cell):
         
         print("canvasPosition ", self.position);
         self.position.add(displacement);
-        print("canvasPosition after displacement ", self.position);
+        print("displacement ,", displacement, " canvasPosition after displacement ", self.position);
         #Cell Position
         self.genCells();            
 
@@ -91,7 +91,7 @@ class CanvasManager:
         journey.div(12);
         
         print("Displacement vector, ", displacement, " ", journey, " ", PVector.add(displacement, journey));
-        totalDisplacement = PVector.sub(displacement,journey);
+        totalDisplacement = PVector.add(displacement,journey);
         totalDisplacement.x = int(floor(totalDisplacement.x));
         totalDisplacement.y = int(floor(totalDisplacement.y));
         print("total displacement: ", totalDisplacement);
@@ -127,14 +127,10 @@ class CanvasManager:
                     print("_________________________________________________");
                     for i,cell in enumerate(canvas.cellList):
                         if cellInBounds(cell) and i in canvas.pattern:
-                        #print(i, ", creating new canvas from cell, its member size is: ", int(floor(canvas.childCellSize/12)),  " and here's the position: ", cell.position, "  and here's the cell.dim ", cell.dim); 
-                            # initial cell size should be 1/12 OF the new canvas size. the new canvas size IS the size of the cell.
-                            cell = Canvas(cell.position, int(floor(canvas.childCellSize/12)), cell.dim); #This cell is now a canvas. 
-                        # print(i, ", after creating, its size is: ", cell.childCellSize,  " and here's the position: ", cell.position, "  and here's the cell.dim ", cell.dim); 
+                            cell = Canvas(cell.position, int(floor(canvas.childCellSize/12)), cell.dim);
                             canviToAdd.append(cell);
-                        #self.canvasList.append(cell); #Added to list of active canvi
                     self.canvasList.remove(canvas);
-                    self.smallSize = canvas.childCellSize/12;
+                    #self.smallSize = int(floor(canvas.childCellSize/12));
 
             if len(canviToAdd) > 0:
                 self.canvasList.extend(canviToAdd);
