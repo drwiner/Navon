@@ -21,7 +21,7 @@ def draw():
     growIt = 0;
     if keyPressed:
         growIt = 204;
-        main.execute(growIt);
+    main.execute(growIt);
     #rect(20,0,40,40);
 
     
@@ -112,7 +112,7 @@ def patternDraw(listOfCells, cellSize, pattern):
                 giveSizeOnce = True;
             rect(cellX,cellY,cell.dim,cell.dim);
             fill(255);
-            #text(str(cellX) + ' ' + str(cellY),cellX+2,cellY+10);
+            text(str(cellX) + ' ' + str(cellY),cellX+2,cellY+10);
         
 
         
