@@ -15,7 +15,6 @@ class Canvas(Cell):
         self.numRows = int(sqrt(len(self.cellList)));
         self.grandParent = False;
         self.genPattern();
-        #self.pickRandomTarget();
         
     def execute(self):
         return self.cellList;
@@ -23,25 +22,27 @@ class Canvas(Cell):
     def genCells(self):
         canvasRangeX = self.getRangeX();
         canvasRangeY = self.getRangeY();
+        print(self.position, self.dim);
+        print("childcellsize: ", self.childCellSize);
         self.cellList  = [Cell(PVector(r,c),self.childCellSize) for r in canvasRangeX for c in canvasRangeY if (r-self.position.x)%self.childCellSize ==0 and (c-self.position.y)%(self.childCellSize)==0];
+        print(len(self.cellList));
         return self.cellList;
     
     def updateCells(self,displacement,increase):
+       
         #Canvas Size
         self.dim += int(increase); # The canvas is now larger.
         distributedIncrease = int(increase/self.numRows); # The increase divided by the number of cells in the row/col. Thus, increase should be dividible into num rows...
         
         #Cell Size
         self.childCellSize += distributedIncrease; #The children are larger
+        print("childcellsize: ", self.childCellSize);
         
         #Canvas Position
-        
-        print("canvasPosition ", self.position);
         self.position.add(displacement);
-        print("displacement ,", displacement, " canvasPosition after displacement ", self.position);
+        
         #Cell Position
         self.genCells();            
-
 
     #Creates a list of integers corresponding to indices in the cellList
     def genPattern(self):
@@ -66,38 +67,52 @@ class CanvasManager:
         #Canvas created by consuming a cell. Canvas List created with initial cell entry
         self.canvasList = [Canvas(PVector(0,0),initialSize,totalBoardSpace)]; #Canvas that takes entire board
         self.pickCellFromCanvas();
-        self.smallSize = initialSize;
+        
         
 
     def pickCellFromCanvas(self):
         spaceSize = len(self.canvasList);
-        randomCanvas = self.canvasList[int(floor(random() * spaceSize))];
+        randomCanvas = self.canvasList[int(floor(random() * spaceSize))]; 
         self.center, self.centerInOrder = randomCanvas.pickRandomTarget();
+        self.smallSize = self.center.dim;
+        self.centerCanvasPosition = randomCanvas.position;
+
+        print(":::::::::::::::::::::::::::::::::::::::::");
+        print("center selected: ", self.center.position);
+        print("center position in list: ", self.centerInOrder);
+        print("size: ", self.center.dim);
+        print("canvas position of center : ", self.centerCanvasPosition);
+        print("predicted center: ", PVector.add(self.centerCanvasPosition, orderToCoord(self.centerInOrder-1,12,self.center.dim)));
+        print(":::::::::::::::::::::::::::::::::::::::::");
         
+    #Calculate new position of center
     def updateCenter(self, amountIncrease):
-        #Calculate new position of center
+        
+        #size of cells
         distributedIncrease = amountIncrease/12;
-        #The amount that all canvi should be moved, is the amount the center will move
-        prior = orderToCoord(self.centerInOrder,12,self.smallSize);
-        print("prior ", prior, " vs center.pos ", self.center.position);
         self.smallSize = self.smallSize + distributedIncrease;
-        newSize = orderToCoord(self.centerInOrder, 12, self.smallSize);
-        displacement = PVector.sub(prior, newSize);
-        print("before" , self.center.position, " after ", orderToCoord(self.centerInOrder, 12, distributedIncrease));
+        #Calculate the size.
+        newCenterAfterGrowth = PVector.add(self.center.position, orderToCoord(self.centerInOrder, 12, distributedIncrease));
+        #print("before" , self.center.position, " after ", newCenterAfterGrowth);
+        
+        displacement = PVector.sub(self.center.position, newCenterAfterGrowth);
         
         #The amount to get teh center cell to the center of board
-       
-        journey = PVector.sub(PVector(300,300),self.center.position);
+        journey = PVector.sub(PVector(288,288),self.center.position);
         journey.div(12);
         
-        print("Displacement vector, ", displacement, " ", journey, " ", PVector.add(displacement, journey));
+        #print("Displacement vector, ", displacement, " ", journey, " ", PVector.add(displacement, journey));
         totalDisplacement = PVector.add(displacement,journey);
         totalDisplacement.x = int(floor(totalDisplacement.x));
         totalDisplacement.y = int(floor(totalDisplacement.y));
+        
         print("total displacement: ", totalDisplacement);
-        print("centerPosition: ", self.center.position);
+        #print("centerPosition: ", self.center.position);
+        
+
         newCenter = PVector.add(self.center.position, totalDisplacement)
-        print("centerPosition After: ", newCenter);
+
+        #print("centerPosition After: ", newCenter);
 
         
         return totalDisplacement;
@@ -114,15 +129,15 @@ class CanvasManager:
             
             canviToAdd = [];
             for canvas in self.canvasList:
-                
                 #Remove from consideration if canvas isn't on board
                 if not cellInBounds(canvas):
                     self.canvasList.remove(canvas);
                     continue;
                 
+                
                 canvas.updateCells(canviDisplacement,amountIncrease);
                 
-                if canvas.childCellSize >= 84 and not canvas.grandParent:
+                if canvas.childCellSize >= 60 and not canvas.grandParent:
                     canvas.grandParent = True;
                     print("_________________________________________________");
                     for i,cell in enumerate(canvas.cellList):
@@ -130,10 +145,14 @@ class CanvasManager:
                             cell = Canvas(cell.position, int(floor(canvas.childCellSize/12)), cell.dim);
                             canviToAdd.append(cell);
                     self.canvasList.remove(canvas);
+                    
                     #self.smallSize = int(floor(canvas.childCellSize/12));
 
             if len(canviToAdd) > 0:
                 self.canvasList.extend(canviToAdd);
+                #Rule - if the canvas being removed had the center, then the center should be reselected
+                self.pickCellFromCanvas();
+                
         return self.canvasList;
 
 #Helpful method for returning (x,y) tuple that is iterable from pvector

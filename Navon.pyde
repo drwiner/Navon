@@ -6,10 +6,10 @@ from random import random;
 from math import floor
 from Cell import patternA
 
-canvasSize = 600;
-twiceCanvas = canvasSize*2;
+CANVASSIZE = 576;
+twiceCanvas = CANVASSIZE*2;
 def setup():
-    size(canvasSize,canvasSize)
+    size(CANVASSIZE,CANVASSIZE)
     global main
     main = controlCenter();
     background(0);
@@ -20,7 +20,7 @@ def draw():
     background(0);
     growIt = 0;
     if keyPressed:
-        growIt = 204;
+        growIt = 48;
     main.execute(growIt);
     #rect(20,0,40,40);
 
@@ -28,7 +28,7 @@ def draw():
 class controlCenter:
     def __init__(self):
         #Create a Canvas Manager by passing an initial Canvas
-        self.canvasManager = CanvasManager(50, canvasSize);
+        self.canvasManager = CanvasManager(48, CANVASSIZE);
         # figure size, growth rate, upperLeftCoord, canvasSize
 
     def execute(self, growing):

@@ -39,7 +39,7 @@ def coordToOrder(coord,numRows):
 def orderToCoord(order,numRows,delta):
     x = floor(float(order) / float(numRows));
     y = order - (numRows * x);
-    x = x + (x * delta);
-    y = y + (y * delta);
+    x = (x * delta);
+    y = (y * delta);
     print(x,y);
     return PVector(float(x),float(y));
