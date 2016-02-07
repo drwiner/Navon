@@ -5,6 +5,9 @@ class Cell(object):
         self.position = positionVector;
         self.dim = dim;
         
+    def getRange(self):
+        return (self.getRangeX(), self.getRangeY());
+        
     def getRangeX(self):
         return range(int(self.position.x), int(self.position.x) + self.dim);
     
@@ -41,5 +44,5 @@ def orderToCoord(order,numRows,delta):
     y = order - (numRows * x);
     x = (x * delta);
     y = (y * delta);
-    print(x,y);
+    #print(x,y);
     return PVector(float(x),float(y));

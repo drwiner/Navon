@@ -10,23 +10,28 @@ class Canvas(Cell):
     
     def __init__(self, position, initialCellSize, initialCanvasSize):
         super(Canvas,self).__init__(position,initialCanvasSize);
-        self.childCellSize = initialCellSize;
         self.genCells();
-        self.numRows = int(sqrt(len(self.cellList)));
-        self.grandParent = False;
         self.genPattern();
         
-    def execute(self):
-        return self.cellList;
+    def assembleChildren():
+        childrenCells = self.genCells();
+        children = [];
+        for i,child in enumerate(childrenCells):
+            if i in self.pattern:
+                children.append(child.assembleChildren());
+        return children;
                 
     def genCells(self):
-        canvasRangeX = self.getRangeX();
-        canvasRangeY = self.getRangeY();
-        print(self.position, self.dim);
-        print("childcellsize: ", self.childCellSize);
-        self.cellList  = [Cell(PVector(r,c),self.childCellSize) for r in canvasRangeX for c in canvasRangeY if (r-self.position.x)%self.childCellSize ==0 and (c-self.position.y)%(self.childCellSize)==0];
-        print(len(self.cellList));
-        return self.cellList;
+        canvasRangeX, canvasRangeY = self.getRange();
+        self.children  = [Canvas(PVector(r,c),self.childCellSize,self.dim) for r in canvasRangeX for c in canvasRangeY if (r-self.position.x)%self.childCellSize ==0 and (c-self.position.y)%(self.childCellSize)==0];
+        self.favoriteChild = self.children[self.pattern[0]];
+    
+    def updateChildren(self, amountIncrease):
+        for i, cell in enumerate(self.children):
+            if i in self.pattern:
+                cell.updateChildren(amountIncrease);
+        self.dim = self.favoriteChild.dim *12;
+        self.genCells();
     
     def updateCells(self,displacement,increase):
        
