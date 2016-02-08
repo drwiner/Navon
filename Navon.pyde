@@ -50,11 +50,11 @@ def drawCells(listOfCells):
     while 1:
         try:
             cell = listOfCells.next();
+            print(cell.position);
             fill(0,255,0,150);
             rect(cell.position.x,cell.position.y,cell.dim,cell.dim);
         except:
             break;
-            
   
 
 def drawCanvas(listOfCells,cellSize, pattern):

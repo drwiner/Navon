@@ -20,8 +20,7 @@ class Canvas(Cell):
         children = [];
         for i,child in enumerate(childrenCells):
             if i in self.pattern:
-                child.assembleChildren();
-        return children;
+                yield child.assembleChildren();
                 
     def genCells(self):
         canvasRangeX, canvasRangeY = self.getRange();
