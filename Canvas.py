@@ -114,7 +114,6 @@ class Canvas(CanvasLeaf):
     def updateChildrenPositions(self):
         canvasRangeX, canvasRangeY = self.getRange();
         childCellSize = self.dim/12;
-        print("[assemblingChildren, updateChildrenPositions]:: childCellSize: ", childCellSize);
         #Already has children, because it is a canvasLeaf
         childrenPositions  = ((r,c) for r in canvasRangeX for c in canvasRangeY if (r-self.position.x)%childCellSize ==0 and (c-self.position.y)%(childCellSize)==0);
         for child in self.children:
