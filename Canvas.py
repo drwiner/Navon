@@ -8,11 +8,11 @@ from Cell import orderToCoord
 class Canvas(Cell):
     #A Cell has a position, size. Use hasattr to determine if cell is a canvas
     
-    def __init__(self, position, initialCellSize, initialCanvasSize, index):
+    def __init__(self, position, initialCellSize, initialCanvasSize):
         super(Canvas,self).__init__(position,initialCanvasSize);
         self.genCells();
         self.genPattern();
-        self.index = index;
+        self.pickRandomTarget();
         
     def assembleChildren():
         childrenCells = self.genCells();
@@ -36,7 +36,21 @@ class Canvas(Cell):
             self.favoriteChild = self.children[self.pattern[0]];
         #Used as a sample to update .dim size in updateChildren.
         
-        
+    
+    def blossom(self):
+        for i, child in self.children:
+            if i in self.pattern:
+                child = CanvasLeaf(child.position,child.dim,self.dim);
+                
+    def procreate(self):
+        if not isinstance(self.favoriteChild, Canvas):
+            self.blossom();
+        else:
+            for i, child in self.children:
+                if i in self.pattern:
+                    child.procreate();
+                    if isinstance(child,CanvasLeaf):
+                        child = Canvas(child.position, child.dim, self.dim);
     
     def updateChildren(self, amountIncrease):
         self.genCells();
@@ -44,23 +58,10 @@ class Canvas(Cell):
             if i in self.pattern:
                 child.updateChildren(amountIncrease);
         self.dim = self.favoriteChild.dim *12;
-        self.genCells();
-    
-    def updateCells(self,displacement,increase):
-       
-        #Canvas Size
-        self.dim += int(increase); # The canvas is now larger.
-        distributedIncrease = int(increase/self.numRows); # The increase divided by the number of cells in the row/col. Thus, increase should be dividible into num rows...
-        
-        #Cell Size
-        self.childCellSize += distributedIncrease; #The children are larger
-        print("childcellsize: ", self.childCellSize);
-        
-        #Canvas Position
-        self.position.add(displacement);
-        
-        #Cell Position
-        self.genCells();            
+        #self.genCells();
+             
+    def getCenterPosition(self):
+        return self.children[self.centerInOrder].getCenterPosition();
 
     #Creates a list of integers corresponding to indices in the cellList
     def genPattern(self):
@@ -69,13 +70,10 @@ class Canvas(Cell):
     
     #Selects a random integer from the pattern, a list of integers
     #Returns a cell in canvas that is the center for all canvi
-    #Called by Canvas Manager
-    def pickRandomTarget(self):
+   
+    def pickRandomTarget():
         spaceSize = len(self.pattern);
-        self.centerInOrder = self.pattern[int(floor(random()*spaceSize))];
-        self.center = self.cellList[self.centerInOrder]
-        return (self.center, self.centerInOrder);
-        
+        self.centerInOrder = self.pattern[int(floor(random()*spaceSize))];   
 
 
 #Helpful method for returning (x,y) tuple that is iterable from pvector

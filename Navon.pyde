@@ -1,5 +1,5 @@
 from Canvas import Canvas
-from Canvas import CanvasManager
+from Canvas import CanvasRoot
 from time import sleep;
 from Canvas import unpack;
 from random import random;

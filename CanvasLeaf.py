@@ -11,6 +11,7 @@ class CanvasLeaf(Canvas):
     
     def __init__(self, position, canvasLeafSize, childSize):
         super(CanvasLeaf,self).__init__(position,canvasLeafSize,childSize);
+        self.center = self.children[self.centerInOrder];
         
     def updateChildren(self, amountIncrease):
         self.cellSize = self.cellSize + amountIncrease;
@@ -22,10 +23,9 @@ class CanvasLeaf(Canvas):
 
     #def updateDisplacement(self, amountIncrease):
      #   distributedIncrease =
-     
-    def updateChildren(self, amountIncrease):
-        for i in self.children:
-            i.updateChildren(amountIncrease);
+    
+    def getCenterPosition(self):
+        return self.center.position;
             
     def assembleChildren(self):
         self.genCells();
