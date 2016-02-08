@@ -72,10 +72,11 @@ class CanvasLeaf(Cell):
 
             
     def assembleChildren(self):
-        children = []
-        for i, child in enumerate(self.children):
-            if i in self.pattern:
-                children.extend([child]);
+        self.genCells();
+        children = [child for (i,child) in enumerate(self.children) if i in self.pattern];
+#         for i, child in enumerate(self.children):
+#             if i in self.pattern:
+#                 children.extend([child]);
         return children;
     
     #Creates a list of integers corresponding to indices in the cellList
@@ -115,7 +116,7 @@ class Canvas(CanvasLeaf):
         canvasRangeX, canvasRangeY = self.getRange();
         childCellSize = self.dim/12;
         #Already has children, because it is a canvasLeaf
-        childrenPositions  = ((r,c) for r in canvasRangeX for c in canvasRangeY if (r-self.position.x)%childCellSize ==0 and (c-self.position.y)%(childCellSize)==0);
+        childrenPositions  = (PVector(r,c) for r in canvasRangeX for c in canvasRangeY if (r-self.position.x)%childCellSize ==0 and (c-self.position.y)%(childCellSize)==0);
         for child in self.children:
             child.position = childrenPositions.next();
         

@@ -21,7 +21,7 @@ def draw():
     growIt = 0;
     if keyPressed:
         growIt = 4;
-        sleep(.1);
+        sleep(.04);
     main.execute(growIt);
     #rect(20,0,40,40);
 
@@ -38,6 +38,7 @@ class controlCenter:
 ############ DRAWING METHODS ############
 #Provide with generator
 def drawCells(listOfCells):
+    print(len(listOfCells));
     #print('drawing');
     fill(0,255,0,150);
     for i,cell in enumerate(listOfCells):
