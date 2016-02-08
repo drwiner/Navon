@@ -15,6 +15,8 @@ class CanvasLeaf(Canvas):
     def updateChildren(self, amountIncrease):
         self.cellSize = self.cellSize + amountIncrease;
         self.dim = self.dim + amountIncrease*12;
+        for i in self.children:
+            i.updateChildren(amountIncrease);
                 
             #CalculateDisplacement after growth
 
@@ -25,5 +27,6 @@ class CanvasLeaf(Canvas):
         for i in self.children:
             i.updateChildren(amountIncrease);
             
-    def assembleChildren():
-        return self.genCells();
+    def assembleChildren(self):
+        self.genCells();
+        return self.children;

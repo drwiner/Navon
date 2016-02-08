@@ -8,10 +8,11 @@ from Cell import orderToCoord
 class Canvas(Cell):
     #A Cell has a position, size. Use hasattr to determine if cell is a canvas
     
-    def __init__(self, position, initialCellSize, initialCanvasSize):
+    def __init__(self, position, initialCellSize, initialCanvasSize, index):
         super(Canvas,self).__init__(position,initialCanvasSize);
         self.genCells();
         self.genPattern();
+        self.index = index;
         
     def assembleChildren():
         childrenCells = self.genCells();
@@ -23,13 +24,25 @@ class Canvas(Cell):
                 
     def genCells(self):
         canvasRangeX, canvasRangeY = self.getRange();
-        self.children  = [Canvas(PVector(r,c),self.childCellSize,self.dim) for r in canvasRangeX for c in canvasRangeY if (r-self.position.x)%self.childCellSize ==0 and (c-self.position.y)%(self.childCellSize)==0];
-        self.favoriteChild = self.children[self.pattern[0]];
+        
+        if not self.children:
+            self.children = [Cell(PVector(r,c), self.childCellSize) for r in canvasRangeX for c in canvasRangeY if (r-self.position.x)%self.childCellSize ==0 and (c-self.position.y)%(self.childCellSize)==0];
+        else:
+            self.childrenPositions  = ((r,c) for r in canvasRangeX for c in canvasRangeY if (r-self.position.x)%self.childCellSize ==0 and (c-self.position.y)%(self.childCellSize)==0);
+            for i, child in enumerate(self.children):
+                nextPos = self.childrenPositions.next();
+                if i in self.pattern:
+                    child.position = nextPos;
+            self.favoriteChild = self.children[self.pattern[0]];
+        #Used as a sample to update .dim size in updateChildren.
+        
+        
     
     def updateChildren(self, amountIncrease):
-        for i, cell in enumerate(self.children):
+        self.genCells();
+        for i, child in enumerate(self.children):
             if i in self.pattern:
-                cell.updateChildren(amountIncrease);
+                child.updateChildren(amountIncrease);
         self.dim = self.favoriteChild.dim *12;
         self.genCells();
     
