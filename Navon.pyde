@@ -21,40 +21,28 @@ def draw():
     growIt = 0;
     if keyPressed:
         growIt = 4;
+        sleep(.1);
     main.execute(growIt);
     #rect(20,0,40,40);
 
     
 class controlCenter:
     def __init__(self):
-        #Create a Canvas Manager by passing an initial Canvas
-        self.canvasRoot = CanvasRoot(CANVASSIZE, 44);
-        # figure size, growth rate, upperLeftCoord, canvasSize
+        self.canvasRoot = CanvasRoot(CANVASSIZE);
 
     def execute(self, growth):
-        #Update the canvas manager and pass back a list of active canvi
-        self.cellList = self.canvasRoot.update(growth);
-        drawCells(self.cellList);
-        
-#         for i, cell in enumerate(self.cellList):
-#             ## THIS IS USEFUL: 
-#             #print(i);
-#             drawCanvas(canvas.execute(),canvas.dim,canvas.pattern);
-            #canvas.execute() returns a list of cells
-        #sleep(.1);
+        drawCells(self.canvasRoot.update(growth));
         return True;
 
 
 ############ DRAWING METHODS ############
+#Provide with generator
 def drawCells(listOfCells):
-    while 1:
-        try:
-            cell = listOfCells.next();
-            print(cell.position);
-            fill(0,255,0,150);
-            rect(cell.position.x,cell.position.y,cell.dim,cell.dim);
-        except:
-            break;
+    #print('drawing');
+    fill(0,255,0,150);
+    for i,cell in enumerate(listOfCells):
+        #print(i, cell.position);
+        rect(cell.position.x,cell.position.y,cell.dim,cell.dim);
   
 
 def drawCanvas(listOfCells,cellSize, pattern):

@@ -5,64 +5,79 @@ from Cell import patternA
 from Cell import coordToOrder
 from Cell import orderToCoord
 
-
-class Canvas(Cell):
-    #A Cell has a position, size. Use hasattr to determine if cell is a canvas
+#CanvasLeaf is the parent of cells that are drawn to screen
+class CanvasLeaf(Cell):
     
-    def __init__(self, position, initialCellSize, initialCanvasSize):
-        super(Canvas,self).__init__(position,initialCanvasSize);
+    def __init__(self, position, canvasLeafSize):
+        super(CanvasLeaf,self).__init__(position,canvasLeafSize);
+        
+        #Gives position and size
         self.genPattern();
-        self.genCells();
+        
+        #Selects pattern-member as centerInOrder
         self.pickRandomTarget();
         
-    def assembleChildren():
-        childrenCells = self.genCells();
-        children = [];
-        for i,child in enumerate(childrenCells):
+        #Gives pattern order in 12 by 12
+        self.genCells();
+        #Generates and assigns positions to children. Permanent Assignment.
+        
+        
+        
+    def growChildren(self, amountIncrease):
+        
+        #grow Children
+        for i,child in enumerate(self.children):
             if i in self.pattern:
-                yield child.assembleChildren();
+                child.dim = child.dim + amountIncrease;
                 
+        #grow Self
+        self.dim = self.favoriteChild.dim *12;
+
+        #Check if time to blossom
+        self.checkBlossom();
+        
+    #ONLY CALLED ON INIT: original children list generation
     def genCells(self):
         canvasRangeX, canvasRangeY = self.getRange();
-        childCellSize = self.dim/12;
-        if not hasattr(self,'children'):
-            self.children = [Cell(PVector(r,c), childCellSize) for r in canvasRangeX for c in canvasRangeY if (r-self.position.x)%childCellSize ==0 and (c-self.position.y)%(childCellSize)==0];
-        else:
-            self.childrenPositions  = ((r,c) for r in canvasRangeX for c in canvasRangeY if (r-self.position.x)%childCellSize ==0 and (c-self.position.y)%(childCellSize)==0);
-            for i, child in enumerate(self.children):
-                nextPos = self.childrenPositions.next();
-                if i in self.pattern:
-                    child.position = nextPos;
-            self.favoriteChild = self.children[self.pattern[0]];
-        #Used as a sample to update .dim size in updateChildren.
+        #Limit cell positions to canvas range
         
+        childCellSize = self.dim/12;
+        #The self.dim is prescribed by construction
+        
+        #print("[leafnode init genCells]:: childCellSize: ", childCellSize);
+        self.children = [Cell(PVector(r,c), childCellSize) for r in canvasRangeX for c in canvasRangeY if (r-self.position.x)%childCellSize ==0 and (c-self.position.y)%(childCellSize)==0];
+        self.favoriteChild = self.getFavoriteChild();
+        self.checkBlossom();
+        
+    def getCenterPosition(self):
+        return self.position;
+    
+    def checkBlossom(self):
+        childCellSize = self.favoriteChild.dim
+        if childCellSize >= 12 and childCellSize%12 == 0:
+            self.blossom();
     
     def blossom(self):
+        self.__class__ = Canvas;
         for i, child in enumerate(self.children):
             if i in self.pattern:
-                child = CanvasLeaf(child.position,child.dim,self.dim);
-                
-    def procreate(self):
-        if not isinstance(self.favoriteChild, Canvas):
-            self.blossom();
-        else:
-            for i, child in enumerate(self.children):
-                if i in self.pattern:
-                    child.procreate();
-                    if isinstance(child,CanvasLeaf):
-                        child = Canvas(child.position, child.dim, self.dim);
-    
-    def updateChildren(self, amountIncrease):
-        self.genCells();
-        for i, child in enumerate(self.children):
-            if i in self.pattern:
-                child.updateChildren(amountIncrease);
-        self.dim = self.favoriteChild.dim *12;
-        #self.genCells();
-             
-    def getCenterPosition(self):
-        return self.children[self.centerInOrder].getCenterPosition();
+                #print(i, "during blossom");
+                child.__class__ = CanvasLeaf;
+                child.genPattern();
+                child.pickRandomTarget();
+                child.genCells();
+        self.favoriteChild = self.getFavoriteChild();
+       # print("favoriteChild is instance: ", isinstance(self.favoriteChild, CanvasLeaf));
+        #print(self.centerInOrder);
 
+            
+    def assembleChildren(self):
+        children = []
+        for i, child in enumerate(self.children):
+            if i in self.pattern:
+                children.extend([child]);
+        return children;
+    
     #Creates a list of integers corresponding to indices in the cellList
     def genPattern(self):
         pA = patternA();
@@ -70,10 +85,57 @@ class Canvas(Cell):
     
     #Selects a random integer from the pattern, a list of integers
     #Returns a cell in canvas that is the center for all canvi
-   
     def pickRandomTarget(self):
         spaceSize = len(self.pattern);
-        self.centerInOrder = self.pattern[int(floor(random()*spaceSize))];   
+        self.centerInOrder = self.pattern[int(floor(random()*spaceSize))];  
+    
+    def getFavoriteChild(self):
+        return self.children[self.centerInOrder];
+        
+        
+        
+#Middle Nodes in tree/ root node after first blossom
+class Canvas(CanvasLeaf):
+    #A Cell has a position, size. Use hasattr to determine if cell is a canvas
+    
+    def __init__(self, position, initialCanvasSize):
+        super(Canvas,self).__init__(position,initialCanvasSize);
+        
+    def assembleChildren(self):
+        self.updateChildrenPositions();
+        children = [];
+        #Update positions of children
+        for i,child in enumerate(self.children):
+            if i in self.pattern:
+                children.extend(child.assembleChildren());
+          
+        return children; 
+    
+    def updateChildrenPositions(self):
+        canvasRangeX, canvasRangeY = self.getRange();
+        childCellSize = self.dim/12;
+        print("[assemblingChildren, updateChildrenPositions]:: childCellSize: ", childCellSize);
+        #Already has children, because it is a canvasLeaf
+        childrenPositions  = ((r,c) for r in canvasRangeX for c in canvasRangeY if (r-self.position.x)%childCellSize ==0 and (c-self.position.y)%(childCellSize)==0);
+        for child in self.children:
+            child.position = childrenPositions.next();
+        
+    def blossom(self):
+        for i, child in enumerate(self.children):
+            if i in self.pattern:
+                child.blossom();
+    
+    def growChildren(self, amountIncrease):
+        for i, child in enumerate(self.children):
+            if i in self.pattern:
+                child.growChildren(amountIncrease);
+        print("favoriteChildSize: ", self.favoriteChild.dim);
+        self.dim = self.favoriteChild.dim *12;
+    
+             
+    def getCenterPosition(self):
+        return self.favoriteChild.getCenterPosition();
+
 
 
 #Helpful method for returning (x,y) tuple that is iterable from pvector
@@ -107,29 +169,4 @@ def inBounds(unit, low=0, up=599):
         return True;
     return False;
 
-class CanvasLeaf(Canvas):
-    #A Cell has a position, size. Use hasattr to determine if cell is a canvas
-    
-    def __init__(self, position, canvasLeafSize, childSize):
-        super(CanvasLeaf,self).__init__(position,canvasLeafSize,childSize);
-        self.center = self.children[self.centerInOrder];
-        
-    def updateChildren(self, amountIncrease):
-        self.dim = self.dim + amountIncrease*12;
-        for i,child in enumerate(self.children):
-            if i in self.pattern:
-                child.dim = child.dim + amountIncrease;
-
-
-    #def updateDisplacement(self, amountIncrease):
-     #   distributedIncrease =
-    
-    def getCenterPosition(self):
-        return self.center.position;
-            
-    def assembleChildren(self):
-        self.genCells();
-        for i, child in enumerate(self.children):
-            if i in self.pattern:
-                yield child;
                                                                                                 
