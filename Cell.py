@@ -6,13 +6,7 @@ class Cell(object):
         self.dim = dim;
         
     def getRange(self):
-        return (self.getRangeX(), self.getRangeY());
-        
-    def getRangeX(self):
-        return range(int(self.position.x), int(self.position.x) + self.dim);
-    
-    def getRangeY(self):
-        return range(int(self.position.y), int(self.position.y) + self.dim);
+        return (getRangeJ(self.position.x,self.dim), getRangeJ(self.position.y,self.dim));
 
     def update(self):
         if (hasattr(self, desiredPosition)):
@@ -24,8 +18,6 @@ class Cell(object):
         else:
             raise AttributeError("Desired Dimension not set");
             
-def getDimRange(pos, dimSize):
-    return range(int(pos),int(pos) + int(dimSize));
 
 
 def patternA():
@@ -46,3 +38,7 @@ def orderToCoord(order,numRows,delta):
     y = (y * delta);
     #print(x,y);
     return PVector(float(x),float(y));
+
+        
+def getRangeJ(x, dim):
+    return range(x, x + dim);

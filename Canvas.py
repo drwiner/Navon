@@ -53,6 +53,7 @@ class CanvasLeaf(Cell):
         return self.position;
     
     def checkBlossom(self):
+        
         childCellSize = self.favoriteChild.dim
         if childCellSize >= 12 and childCellSize%12 == 0:
             self.blossom();
@@ -61,23 +62,21 @@ class CanvasLeaf(Cell):
         self.__class__ = Canvas;
         for i, child in enumerate(self.children):
             if i in self.pattern:
-                #print(i, "during blossom");
+#                 #print(i, "blossom", child.position, child.dim);
                 child.__class__ = CanvasLeaf;
                 child.genPattern();
                 child.pickRandomTarget();
                 child.genCells();
         self.favoriteChild = self.getFavoriteChild();
-       # print("favoriteChild is instance: ", isinstance(self.favoriteChild, CanvasLeaf));
-        #print(self.centerInOrder);
 
             
     def assembleChildren(self):
-        self.genCells();
-        children = [child for (i,child) in enumerate(self.children) if i in self.pattern];
-#         for i, child in enumerate(self.children):
-#             if i in self.pattern:
-#                 children.extend([child]);
-        return children;
+        if cellInBounds(self):
+            self.genCells();
+            children = [child for (i,child) in enumerate(self.children) if i in self.pattern];
+            return children;
+        else:
+            return [];
     
     #Creates a list of integers corresponding to indices in the cellList
     def genPattern(self):
@@ -108,8 +107,9 @@ class Canvas(CanvasLeaf):
         #Update positions of children
         for i,child in enumerate(self.children):
             if i in self.pattern:
-                children.extend(child.assembleChildren());
-          
+                if cellInBounds(child):
+                    children.extend(child.assembleChildren());
+                    
         return children; 
     
     def updateChildrenPositions(self):
@@ -117,8 +117,14 @@ class Canvas(CanvasLeaf):
         childCellSize = self.dim/12;
         #Already has children, because it is a canvasLeaf
         childrenPositions  = (PVector(r,c) for r in canvasRangeX for c in canvasRangeY if (r-self.position.x)%childCellSize ==0 and (c-self.position.y)%(childCellSize)==0);
-        for child in self.children:
-            child.position = childrenPositions.next();
+        for i,child in enumerate(self.children):
+            try:
+                child.position = childrenPositions.next();
+            except:
+                print("childcellsize: ", childCellSize);
+                print(self.position);
+                print(childrenPositions.next());
+                
         
     def blossom(self):
         for i, child in enumerate(self.children):
@@ -128,7 +134,8 @@ class Canvas(CanvasLeaf):
     def growChildren(self, amountIncrease):
         for i, child in enumerate(self.children):
             if i in self.pattern:
-                child.growChildren(amountIncrease);
+                if cellInBounds(child):
+                    child.growChildren(amountIncrease);
         print("favoriteChildSize: ", self.favoriteChild.dim);
         self.dim = self.favoriteChild.dim *12;
     

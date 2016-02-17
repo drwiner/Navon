@@ -20,7 +20,7 @@ def draw():
     background(0);
     growIt = 0;
     if keyPressed:
-        growIt = 4;
+        growIt = 1;
         sleep(.04);
     main.execute(growIt);
     #rect(20,0,40,40);
@@ -38,17 +38,13 @@ class controlCenter:
 ############ DRAWING METHODS ############
 #Provide with generator
 def drawCells(listOfCells):
-    print(len(listOfCells));
+    #print(len(listOfCells));
     #print('drawing');
     fill(0,255,0,150);
     for i,cell in enumerate(listOfCells):
         #print(i, cell.position);
         rect(cell.position.x,cell.position.y,cell.dim,cell.dim);
   
-
-def drawCanvas(listOfCells,cellSize, pattern):
-    #testDraw2(listOfCells, cellSize);
-    patternDraw(listOfCells,cellSize, pattern);
 
 def patternDraw(listOfCells, cellSize, pattern):
     #listOfCells = the list of cells in a particular canvas
