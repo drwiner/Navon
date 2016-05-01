@@ -32,7 +32,7 @@ class controlCenter:
         #self.letters = ['A' for x in range(NUM_LEVELS) if x%0 is 0]
         self.letters=['C','A','T','C','A','T']
         first_canvas = Canvas(ORIGIN,MAXBOUND,self.letters[0], 0)
-        self.createCanviVec(first_canvas,NUM_LEVELS-1)
+        self.createCanviVec(first_canvas,0)
         drawCells(self.canvi_vec[0])
     
     def createCanviVec(self,first_canvas,letter_pos):
