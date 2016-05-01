@@ -7,14 +7,16 @@ from math import floor
 MAXBOUND = 2000
 MINBOUND = 0
 LETTER_PATTERN_LENGTH = 12
-CLIST = [(0,4),(0,5),(0,6),(0,7),(1,3),(1,5),(1,6),(1,7),(1,8),(2,2),(2,3),(2,4),(2,7),(2,8),(2,9),(3,1),(3,2),(3,3),(3,8),(3,9),(3,10),(4,0),(4,1),(4,2),(4,9),(4,10),(4,11),(5,0),(5,1),(6,0),(6,1),(7,0),(7,1),(8,0),(8,1),(5,11),(5,10),(6,11),(6,10),(7,11),(7,10),(8,11),(8,10)]
-LETTER_DICT = {'A':[(5,0),(6,0),(5,1),(6,1),(4,2),(5,2),(6,2),(7,2),(4,3),(5,3),(6,3),
-					(7,3),(3,4),(4,4),(7,4),(8,4),(3,5),(4,5),(7,5),(8,5),(2,6),(3,6),
-					(4,6),(5,6),(6,6),(7,6),(8,6),(9,6),(2,7),(3,7),(4,7),(5,7),(6,7),
-					(7,7),(8,7),(9,7),(1,8),(2,8),(9,8),(10,8),(1,9),(2,9),(9,9),(10,9),
-					(0,10),(1,10),(10,10),(11,10),(0,11),(1,11),(10,11),(11,11)],'C':CLIST}
 
-def canviGen(canvi_vec, i, letter_set):
+ALIST = [(5,0),(6,0),(5,1),(6,1),(4,2),(5,2),(6,2),(7,2),(4,3),(5,3),(6,3),(7,3),(3,4),(4,4),(7,4),(8,4),(3,5),(4,5),(7,5),(8,5),(2,6),(3,6),(4,6),(5,6),(6,6),(7,6),(8,6),(9,6),(2,7),(3,7),(4,7),(5,7),(6,7),(7,7),(8,7),(9,7),(1,8),(2,8),(9,8),(10,8),(1,9),(2,9),(9,9),(10,9),(0,10),(1,10),(10,10),(11,10),(0,11),(1,11),(10,11),(11,11)]
+
+CLIST = [(0,4),(0,5),(0,6),(0,7),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(2,2),(2,3),(2,4),(2,7),(2,8),(2,9),(3,1),(3,2),(3,3),(3,8),(3,9),(3,10),(4,0),(4,1),(4,2),(4,9),(4,10),(4,11),(5,0),(5,1),(6,0),(6,1),(7,0),(7,1),(8,0),(8,1),(5,11),(5,10),(6,11),(6,10),(7,11),(7,10),(8,11),(8,10),(9,11),(9,10),(9,9),(10,10),(10,9),(10,8),(9,0),(9,1),(9,2),(9,3),(9,8),(10,1),(10,2),(10,3)]
+
+TLIST = [(1,0),(2,0),(3,0),(4,0),(5,0),(6,0),(7,0),(8,0),(9,0),(10,0),(1,1),(2,1),(3,1),(4,1),(5,1),(6,1),(7,1),(8,1),(9,1),(10,1),(1,2),(10,2),(5,2),(5,3),(5,4),(5,5),(5,6),(5,7),(5,8),(5,9),(5,10),(6,2),(6,3),(6,4),(6,5),(6,6),(6,7),(6,8),(6,9),(6,10),(3,10),(4,9),(4,10),(7,9),(7,10),(8,10)]
+
+LETTER_DICT = {'A':ALIST,'C':CLIST,'T':TLIST}
+
+def canviGen(canvi_vec, i, letter_list, prior_letter_pos):
 	"returns Vector of canvi lists"
 	"Vector({0,...,n},{0:[Canvas()],1:[Canvas(),...,Canvas()],...,n:[Canvas(),...,]})"
 	if i  < 0:
@@ -22,8 +24,9 @@ def canviGen(canvi_vec, i, letter_set):
 	else:
 		if i not in canvi_vec.D:
 			canvi_vec.D.add(i)
-		canvi_vec[i] = makeLevel(canvi_vec[i+1],letter_set[i])
-		return canviGen(canvi_vec,i-1,letter_set)
+		this_letter_pos = getNextLetterPos(prior_letter_pos,len(letter_list))
+		canvi_vec[i] = makeLevel(canvi_vec[i+1],letter_list[this_letter_pos],this_letter_pos)
+		return canviGen(canvi_vec,i-1,letter_list, this_letter_pos)
 		
 def getAnyItem(some_set_or_list):
 	return next(iter(some_set_or_list))
@@ -31,16 +34,21 @@ def getAnyItem(some_set_or_list):
 	#for item in some_set_or_list:
 		#print('itemSize: ', item.cell_size)
 		#return item
-	
+
+def getNextLetterPos(pos, num_levels):
+        if pos >= num_levels-1:
+            return 0
+        else:
+            return pos + 1
 		
-def makeLevel(composite,letter):
+def makeLevel(composite,letter,letter_pos):
 	"Input: list of canvi, letter"
 	"returns primitive canvi list"
 	coords = canviList2coords(composite)
 	#shuffle(composite)
 	parent_canvas = getAnyItem(composite)
 	new_size =  parent_canvas.cell_size / LETTER_PATTERN_LENGTH
-	return [Canvas(top_left,new_size,letter) for top_left in coords if inView(top_left,new_size)]
+	return [Canvas(top_left,new_size,letter,letter_pos) for top_left in coords if inView(top_left,new_size)]
 
 
 def inView(vector,cell_size):
@@ -49,15 +57,13 @@ def inView(vector,cell_size):
 		return True
 	return False
 		
-def addLevel(canvi_vec,letter, center):
+def addLevel(canvi_vec,letter_list,letter_pos,center):
 	"input: canvi_vec, letter"
 	"returns canvi_vec with levels shifted to push most-composite out and add to most primitive"
 	k = getDomainLength(canvi_vec)
-	print(center.cell_size)
-	print(center.top_left)
 	first_vec = Vec(set(range(k)),{k-1:[center]})
-	letter_set = [letter for l in range(k)]
-	canvi_vec = canviGen(first_vec,k-2,letter_set)
+	#letter_list = [letter for l in range(k)]
+	canvi_vec = canviGen(first_vec,k-2,letter_list,letter_pos)
 	#for i in reversed(range(1,k-1)):
 	#	canvi_vec[i] = canvi_vec[i-1]
 	#canvi_vec[0] = makeLevel(canvi_vec[1],letter)
@@ -67,17 +73,9 @@ def addLevel(canvi_vec,letter, center):
 def chooseCenter(canvi_vec):
 	"Returns any canvas position from 2nd most composite level"
 	k = len(canvi_vec.D)-2
-	print(canvi_vec.D)
-	print(len(canvi_vec.D))
-	#shuffle(canvi_vec[k])
 	top_level = updateBounds(canvi_vec[k])
-	#top_level = updateBounds(top_level)
-	#shuffle(top_level)
 	"TODO: auto update when checking in_bounds"
 	if len(top_level) > 0:
-		#potential_center = top_level[int(floor(len(top_level)/2))]
-		#if potential_center.in_bounds:
-		#	return potential_center
 		for potential_center in top_level:
 			if potential_center.in_bounds:
 				return potential_center
@@ -165,9 +163,10 @@ def translateVectors(C, rate):
 		
 
 class Canvas():
-	def __init__(self, top_left, cell_size, letter):
+	def __init__(self, top_left, cell_size, letter, letter_pos):
 		self.top_left = top_left
 		self.letter = letter
+		self.letter_pos = letter_pos
 		self.cell_size = cell_size
 		self.in_bounds = True
 	
