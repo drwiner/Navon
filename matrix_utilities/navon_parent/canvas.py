@@ -4,7 +4,7 @@
 from vecutil import *
 from random import shuffle
 from math import floor
-MAXBOUND = 1000
+MAXBOUND = 2000
 MINBOUND = 0
 LETTER_PATTERN_LENGTH = 12
 
@@ -55,20 +55,12 @@ def inView(vector,cell_size):
 	x = vector[0]
 	y = vector[1]
 	return x > -cell_size and y > -cell_size and x < MAXBOUND and y < MAXBOUND
-		
-def addLevel(canvi_vec,letter_list,letter_pos,center):
-	"input: canvi_vec, letter"
-	"returns canvi_vec with levels shifted to push most-composite out and add to most primitive"
-	k = getDomainLength(canvi_vec)
-	first_vec = Vec(set(range(k)),{k-1:[center]})
-	canvi_vec = canviGen(first_vec,k-2,letter_list,letter_pos)
-	return canvi_vec
 	
 def pushLevel(canvi_vec, letter_list, primitive_canvas):
 	next_pos = getNextLetterPos(primitive_canvas.letter_pos, len(letter_list))
 	next_letter = letter_list[next_pos]
 	canvi_vec = upshift(canvi_vec)
-	canvi_vec[0] = makeLevel(canvi_vec[0],next_letter,next_pos)
+	canvi_vec[0] = makeLevel(canvi_vec[1],next_letter,next_pos)
 	return canvi_vec
 	
 def upshift(canvi_vec):
@@ -80,23 +72,23 @@ def upshift(canvi_vec):
 	
 def popLevel(canvi_vec):
 	k = len(canvi_vec.D)
-	v[k-1] = []
+	canvi_vec[k-1] = []
 	canvi_vec.D.remove(k-1)
 	return canvi_vec
 	
 def chooseCenter(canvi_vec):
 	"Returns any canvas position from 2nd most composite level"
 	k = len(canvi_vec.D)-2
-	top_level = updateBounds(canvi_vec[k])
+	#top_level = updateBounds(canvi_vec[k])
+	top_level = canvi_vec[k]
 	"TODO: auto update when checking in_bounds"
 	if len(top_level) > 0:
 		for potential_center in top_level:
 			if potential_center.in_bounds:
-				return potential_center
-		print("nothing deemed in bounds")
-	else:
-		print("no canvi in top_level at chooseCenter")
-		return Vec({0,1},{0:0,1:0})
+				if potential_center.checkInBounds():
+					return potential_center
+				else:
+					potential_center.in_bounds = False
 		
 def choosePrimitive(canvi_vec):
 	for canvas in canvi_vec[0]:
@@ -108,11 +100,15 @@ def canviList2coords(C):
 	"Returns list of coords"
 	coords = []
 	for c in C:
-		if c.coords is None:
-			c.canvas2Coords()
-		for coord in c.coords:
-			coords.append(coord)
-			#print(coord)
+		if c.in_view:
+			if inView(c.top_left,c.cell_size):
+				if c.coords is None:
+					c.canvas2Coords()
+				for coord in c.coords:
+					coords.append(coord)
+			#else:
+				#c.in_view = False
+				#print(coord)
 	return coords
 
 #Call this for dilation
@@ -201,6 +197,7 @@ class Canvas():
 		y = self.top_left[1]
 		if x < MINBOUND or y < MINBOUND or x > MAXBOUND or y > MAXBOUND:
 			self.in_bounds = False
+		return self.in_bounds
 		
 class Center:
 	#def __init__(self, top_left, cell_size, letter):

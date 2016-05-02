@@ -2,9 +2,9 @@
 from vecutil import *
 from canvas import *
 from time import sleep
-MAXBOUND = 1000
+MAXBOUND = 2000
 MINBOUND = 0
-PRIMSIZE = 36
+PRIMSIZE = 12
 NUM_LEVELS = 3
 GROWTH_RATE = 1.05
 ORIGIN = Vec({0,1},{0:0,1:0})
@@ -36,6 +36,9 @@ class controlCenter:
         self.letters=['C','A','T','C','A','T']
         first_canvas = Canvas(ORIGIN,MAXBOUND,self.letters[0], 0)
         self.createCanviVec(first_canvas,0)
+        self.center = chooseCenter(self.canvi_vec)
+        self.Center = Center(self.center,GROWTH_RATE)
+        self.primitive = choosePrimitive(self.canvi_vec)
         drawCells(self.canvi_vec[0])
     
     def createCanviVec(self,first_canvas,letter_pos):
@@ -50,28 +53,26 @@ class controlCenter:
     
     def grow(self, growth_rate):
         "TODO: 1) Update when letters decompose, should be earlier!  2) Translate via dilateVectors, do math (meh, working fine :)"
-       # print('grow')
-        if self.has_center is False:
+
+        if self.center.cell_size > MAXBOUND:
+            print('this occurred')
+            self.canvi_vec = popLevel(self.canvi_vec)
+            #first_canvas = Canvas(self.center.top_left,self.center.cell_size,self.center.letter,self.center.letter_pos)
+            #self.createCanviVec(first_canvas,self.center.letter_pos)
+            self.num_levels = self.num_levels - 1
             self.center = chooseCenter(self.canvi_vec)
             self.Center = Center(self.center,GROWTH_RATE)
-            self.has_center = True
-            
-        if self.has_primitive is False:
-            self.primitive = choosePrimitive(self.canvi_vec)
-            self.has_primitive = True
-            
         
         if self.primitive.cell_size > PRIMSIZE:
             self.num_levels = self.num_levels + 1
             self.canvi_vec = pushLevel(self.canvi_vec, self.letters,self.primitive)
-            self.has_primitive = False
+            self.primitive = choosePrimitive(self.canvi_vec)
         
-        if self.center.cell_size > MAXBOUND:
-            #self.canvi_vec = popLevel(self.canvi_vec)
-            first_canvas = Canvas(self.center.top_left,self.center.cell_size,self.center.letter,self.center.letter_pos)
-            self.createCanviVec(first_canvas,self.center.letter_pos)
-            self.num_levels = self.num_levels - 1
-            self.has_center = False
+        if self.num_levels <= 2:
+            self.primitive = choosePrimitive(self.canvi_vec)
+            self.center = chooseCenter(self.canvi_vec)
+            self.Center = Center(self.center,GROWTH_RATE)
+            print(self.primitive.cell_size, " ", self.center.cell_size)
 
         self.canvi_vec = dilateVectors(self.canvi_vec,self.center.top_left,growth_rate,self.Center.translate_rate)
 
