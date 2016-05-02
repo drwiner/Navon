@@ -2,9 +2,10 @@
 from vecutil import *
 from canvas import *
 from time import sleep
-MAXBOUND = 2000
+MAXBOUND = 1000
 MINBOUND = 0
-NUM_LEVELS = 4
+PRIMSIZE = 36
+NUM_LEVELS = 3
 GROWTH_RATE = 1.05
 ORIGIN = Vec({0,1},{0:0,1:0})
 
@@ -29,6 +30,8 @@ def draw():
 class controlCenter:
     def __init__(self):
         self.has_center = False
+        self.has_primitive = False
+        self.num_levels = NUM_LEVELS
         #self.letters = ['A' for x in range(NUM_LEVELS) if x%0 is 0]
         self.letters=['C','A','T','C','A','T']
         first_canvas = Canvas(ORIGIN,MAXBOUND,self.letters[0], 0)
@@ -36,9 +39,9 @@ class controlCenter:
         drawCells(self.canvi_vec[0])
     
     def createCanviVec(self,first_canvas,letter_pos):
-        first_level = {NUM_LEVELS-1:[first_canvas]}
-        first_vec = Vec(set(range(NUM_LEVELS)),first_level)
-        self.canvi_vec = canviGen(first_vec, NUM_LEVELS-2, self.letters,letter_pos)
+        first_level = {self.num_levels-1:[first_canvas]}
+        first_vec = Vec(set(range(self.num_levels)),first_level)
+        self.canvi_vec = canviGen(first_vec, self.num_levels-2, self.letters,letter_pos)
 
     def execute(self):
         background(0)
@@ -53,18 +56,24 @@ class controlCenter:
             self.Center = Center(self.center,GROWTH_RATE)
             self.has_center = True
             
-        self.canvi_vec = dilateVectors(self.canvi_vec,self.center.top_left,growth_rate,self.Center.translate_rate)
+        if self.has_primitive is False:
+            self.primitive = choosePrimitive(self.canvi_vec)
+            self.has_primitive = True
+            
+        
+        if self.primitive.cell_size > PRIMSIZE:
+            self.num_levels = self.num_levels + 1
+            self.canvi_vec = pushLevel(self.canvi_vec, self.letters,self.primitive)
+            self.has_primitive = False
         
         if self.center.cell_size > MAXBOUND:
+            #self.canvi_vec = popLevel(self.canvi_vec)
             first_canvas = Canvas(self.center.top_left,self.center.cell_size,self.center.letter,self.center.letter_pos)
             self.createCanviVec(first_canvas,self.center.letter_pos)
+            self.num_levels = self.num_levels - 1
             self.has_center = False
-            
-        #self.canvi_vec = addLevel(self.canvi_vec,'A',self.center)
-            #print('len top level: ', len(self.canvi_vec[2]))
-            #print('len second level: ', len(self.canvi_vec[1]))
-            #print('len prim level: ', len(self.canvi_vec[0]))
 
+        self.canvi_vec = dilateVectors(self.canvi_vec,self.center.top_left,growth_rate,self.Center.translate_rate)
 
 ############ DRAWING METHODS ############
 

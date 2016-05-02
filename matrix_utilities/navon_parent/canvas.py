@@ -4,7 +4,7 @@
 from vecutil import *
 from random import shuffle
 from math import floor
-MAXBOUND = 2000
+MAXBOUND = 1000
 MINBOUND = 0
 LETTER_PATTERN_LENGTH = 12
 
@@ -52,23 +52,37 @@ def makeLevel(composite,letter,letter_pos):
 
 
 def inView(vector,cell_size):
-	x,y = (vector[0],vector[1])
-	if x > -cell_size and y > -cell_size and x < MAXBOUND and y < MAXBOUND:
-		return True
-	return False
+	x = vector[0]
+	y = vector[1]
+	return x > -cell_size and y > -cell_size and x < MAXBOUND and y < MAXBOUND
 		
 def addLevel(canvi_vec,letter_list,letter_pos,center):
 	"input: canvi_vec, letter"
 	"returns canvi_vec with levels shifted to push most-composite out and add to most primitive"
 	k = getDomainLength(canvi_vec)
 	first_vec = Vec(set(range(k)),{k-1:[center]})
-	#letter_list = [letter for l in range(k)]
 	canvi_vec = canviGen(first_vec,k-2,letter_list,letter_pos)
-	#for i in reversed(range(1,k-1)):
-	#	canvi_vec[i] = canvi_vec[i-1]
-	#canvi_vec[0] = makeLevel(canvi_vec[1],letter)
 	return canvi_vec
 	
+def pushLevel(canvi_vec, letter_list, primitive_canvas):
+	next_pos = getNextLetterPos(primitive_canvas.letter_pos, len(letter_list))
+	next_letter = letter_list[next_pos]
+	canvi_vec = upshift(canvi_vec)
+	canvi_vec[0] = makeLevel(canvi_vec[0],next_letter,next_pos)
+	return canvi_vec
+	
+def upshift(canvi_vec):
+	k = len(canvi_vec.D)
+	canvi_vec.D.add(k)
+	for i in reversed(range(k)):
+		canvi_vec[i+1] = canvi_vec[i]
+	return canvi_vec
+	
+def popLevel(canvi_vec):
+	k = len(canvi_vec.D)
+	v[k-1] = []
+	canvi_vec.D.remove(k-1)
+	return canvi_vec
 	
 def chooseCenter(canvi_vec):
 	"Returns any canvas position from 2nd most composite level"
@@ -83,6 +97,11 @@ def chooseCenter(canvi_vec):
 	else:
 		print("no canvi in top_level at chooseCenter")
 		return Vec({0,1},{0:0,1:0})
+		
+def choosePrimitive(canvi_vec):
+	for canvas in canvi_vec[0]:
+		if inView(canvas.top_left,canvas.cell_size):
+			return canvas
 
 def canviList2coords(C):
 	"Input: list of canvi"
@@ -133,34 +152,23 @@ def vec2point(vector):
 	return (vector[0],vector[1])
 	
 def dilateVectors(C, center, scale_factor, translate_rate):
+	"Input: canvi_vec"
+	"Returns canvi_vec with updated scaling and translation"
 	#print(C.D)
-	try:
-		for level in C:
-			#print(len(level))
-			for canvas in level:
+	k = len(C.D)
+	print(k)
+	for level in reversed(range(k)):
+		for canvas in C[level]:
+			if canvas.in_view:
 				if inView(canvas.top_left, canvas.cell_size):
 					canvas.top_left = dilate(canvas.top_left, center, scale_factor)
 					canvas.top_left = canvas.top_left + translate_rate
 					canvas.cell_size = canvas.cell_size*scale_factor
-					if len(level) == 1:
-						return C
-	except:
-		return C
+				else:
+					canvas.in_view = False
+					#C[level].remove(canvas)
 	return C
 	
-def translateVectors(C, rate):
-	try:
-		for level in C:
-			for canvas in level:
-				if inView(canvas.top_left, canvas.cell_size):
-					canvas.top_left = canvas.top_left + rate
-					print('translate rate: ', rate)
-					if len(level) == 1:
-						return C
-	except:
-		return C
-	return C
-		
 
 class Canvas():
 	def __init__(self, top_left, cell_size, letter, letter_pos):
@@ -169,6 +177,7 @@ class Canvas():
 		self.letter_pos = letter_pos
 		self.cell_size = cell_size
 		self.in_bounds = True
+		self.in_view = True
 	
 	def __getattr__(self,name): 
 		"TODO: test that this lazy attribute setting works"
