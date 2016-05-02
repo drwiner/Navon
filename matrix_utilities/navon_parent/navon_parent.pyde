@@ -2,7 +2,7 @@
 from vecutil import *
 from canvas import *
 from time import sleep
-MAXBOUND = 2000
+MAXBOUND = 1600
 MINBOUND = 0
 PRIMSIZE = 12
 NUM_LEVELS = 3

@@ -4,7 +4,7 @@
 from vecutil import *
 from random import shuffle
 from math import floor
-MAXBOUND = 2000
+MAXBOUND = 1600
 MINBOUND = 0
 LETTER_PATTERN_LENGTH = 12
 
